@@ -10,3 +10,5 @@ web-build/
 *.orig.*
 .env
 .env.local
+backend/.env
+backend/node_modules/

@@ -12,6 +12,7 @@ import Logo from '../../components/Logo';
 import PrimaryButton from '../../components/PrimaryButton';
 import OTPInput from '../../components/OTPInput';
 import { Colors, Spacing, Radius } from '../../theme';
+import { verifySmsOTP, sendSmsOTP } from '../../config/api';
 
 const RESEND_COOLDOWN = 60;
 
@@ -51,20 +52,22 @@ export default function EmployeeOTPScreen({ navigation, route }) {
     setVerifyError('');
     setLoading(true);
 
-    // Simulate SMS OTP verification — demo code is 654321
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-
-    if (otp !== '654321') {
-      setVerifyError('Invalid SMS code. Please try again or request a new one.');
+    try {
+      const data = await verifySmsOTP(mobile, otp);
+      if (!data.valid) {
+        setVerifyError(data.message || 'Invalid code. Please try again.');
+        shake();
+        return;
+      }
+      navigation.replace('Main', {
+        user: { type: 'employee', name: fullName, employeeId, mobile },
+      });
+    } catch {
+      setVerifyError('Network error. Make sure the server is running.');
       shake();
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    // Success — enter the main tab navigator
-    navigation.replace('Main', {
-      user: { type: 'employee', name: fullName, employeeId, mobile },
-    });
   };
 
   const handleResend = async () => {
@@ -72,9 +75,15 @@ export default function EmployeeOTPScreen({ navigation, route }) {
     setResending(true);
     setOtp('');
     setVerifyError('');
-    await new Promise((r) => setTimeout(r, 1000));
-    setResending(false);
-    setCountdown(RESEND_COOLDOWN);
+    try {
+      const data = await sendSmsOTP(mobile, fullName);
+      if (!data.success) setVerifyError(data.message || 'Failed to resend code.');
+    } catch {
+      setVerifyError('Network error while resending.');
+    } finally {
+      setResending(false);
+      setCountdown(RESEND_COOLDOWN);
+    }
   };
 
   const maskedMobile = mobile.replace(/(\+?\d{3})(\d+)(\d{4})/, '$1****$3');
