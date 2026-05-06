@@ -61,7 +61,10 @@ export default function EmployeeOTPScreen({ navigation, route }) {
       return;
     }
 
-    navigation.replace('EmployeeHome', { fullName, employeeId, mobile });
+    // Success — enter the main tab navigator
+    navigation.replace('Main', {
+      user: { type: 'employee', name: fullName, employeeId, mobile },
+    });
   };
 
   const handleResend = async () => {

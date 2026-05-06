@@ -62,8 +62,10 @@ export default function GuestOTPScreen({ navigation, route }) {
       return;
     }
 
-    // Success
-    navigation.replace('GuestHome', { name, gmail });
+    // Success — enter the main tab navigator
+    navigation.replace('Main', {
+      user: { type: 'guest', name, email: gmail },
+    });
   };
 
   const handleResend = async () => {

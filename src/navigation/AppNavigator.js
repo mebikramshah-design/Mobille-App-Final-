@@ -5,10 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import GuestLoginScreen from '../screens/guest/GuestLoginScreen';
 import GuestOTPScreen from '../screens/guest/GuestOTPScreen';
-import GuestHomeScreen from '../screens/guest/GuestHomeScreen';
 import EmployeeRegisterScreen from '../screens/employee/EmployeeRegisterScreen';
 import EmployeeOTPScreen from '../screens/employee/EmployeeOTPScreen';
-import EmployeeHomeScreen from '../screens/employee/EmployeeHomeScreen';
+import ProjectDetailScreen from '../screens/ProjectDetailScreen';
+import MainTabs from './MainTabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,18 +19,26 @@ export default function AppNavigator() {
         initialRouteName="Welcome"
         screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
       >
-        {/* Landing */}
+        {/* Auth flow */}
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
-
-        {/* Guest flow */}
         <Stack.Screen name="GuestLogin" component={GuestLoginScreen} />
         <Stack.Screen name="GuestOTP" component={GuestOTPScreen} />
-        <Stack.Screen name="GuestHome" component={GuestHomeScreen} />
-
-        {/* Employee flow */}
         <Stack.Screen name="EmployeeRegister" component={EmployeeRegisterScreen} />
         <Stack.Screen name="EmployeeOTP" component={EmployeeOTPScreen} />
-        <Stack.Screen name="EmployeeHome" component={EmployeeHomeScreen} />
+
+        {/* Main app — bottom tabs */}
+        <Stack.Screen
+          name="Main"
+          component={MainTabs}
+          options={{ animation: 'fade' }}
+        />
+
+        {/* Detail screens (over the tabs) */}
+        <Stack.Screen
+          name="ProjectDetail"
+          component={ProjectDetailScreen}
+          options={{ animation: 'slide_from_bottom' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
