@@ -2,6 +2,19 @@
 
 A React Native (Expo) mobile application for **Darwish Interserve Facility Management W.L.L.**, Qatar's leading integrated facility management company.
 
+## Features — Phase 2: Post-Login Tab Navigation
+
+After successful authentication, the app drops the user into a 4-tab bottom
+navigator. Both Guest and Employee users share the same tab structure, but
+content adapts based on `user.type`.
+
+| Tab        | Description |
+|------------|-------------|
+| **Home**     | Greeting, hero stats card, employee quick-actions (Work Orders / Clock In / Schedule / Reports), services grid (Hard FM, Soft FM, Security, MEP, Cleaning, Landscaping), featured client |
+| **Events**   | Featured event banner with RSVP, filter chips (All / Training / HSE / Company / Holidays), date-block event list with type pills |
+| **Projects** | Stats summary card (Total/Active/Staff/Sites), status filter pills with counts, project cards with progress bars and next-milestone footer |
+| **Profile**  | Avatar with verified badge (employees), employee/guest pill, contact info, employee tile row (Tasks/Awards/Tenure), grouped settings (Account/Preferences/Support), logout button |
+
 ## Features — Phase 1: Dual Authentication
 
 ### Guest User Flow
