@@ -1,111 +1,65 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenHeader from '../../components/ScreenHeader';
 import { Colors, Spacing, Radius, Shadow } from '../../theme';
 
-const STATUSES = [
-  { key: 'all',      label: 'All',       count: 24 },
-  { key: 'active',   label: 'Active',    count: 18 },
-  { key: 'pending',  label: 'Pending',   count: 4 },
-  { key: 'complete', label: 'Complete',  count: 2 },
-];
-
-const PROJECTS = [
+export const PROJECTS = [
   {
-    id: '1',
-    name: 'Hamad International Airport',
-    code: 'HIA-2024-FM',
-    sector: 'Aviation',
-    status: 'active',
-    progress: 78,
-    icon: 'airplane',
-    color: '#3B82F6',
-    sites: 12,
-    staff: 240,
-    nextMilestone: 'Annual MEP audit · May 22',
-  },
-  {
-    id: '2',
-    name: 'Qatar Public Schools Network',
-    code: 'PSN-2024-INT',
-    sector: 'Education',
-    status: 'active',
-    progress: 92,
+    id: 'p1',
+    name: 'Integrated Facility Management — Education Sector',
+    short: 'Education Sector',
+    client: 'Government Entity',
+    description:
+      'Comprehensive facility management services including maintenance, cleaning, and operational support for educational institutions.',
     icon: 'school',
     color: '#10B981',
+    tint: '#E6FBF3',
     sites: 215,
-    staff: 1200,
-    nextMilestone: 'Term-end deep clean · May 28',
   },
   {
-    id: '3',
-    name: 'Aspire Zone Foundation',
-    code: 'AZF-2024-SPT',
-    sector: 'Sports',
-    status: 'active',
-    progress: 64,
-    icon: 'fitness',
-    color: '#F59E0B',
-    sites: 8,
-    staff: 180,
-    nextMilestone: 'Stadium prep · May 15',
+    id: 'p2',
+    name: 'Aviation Facility Maintenance',
+    short: 'Aviation Sector',
+    client: 'Aviation Sector',
+    description:
+      'Delivery of specialized maintenance services including HVAC systems, fire safety systems, and infrastructure support.',
+    icon: 'airplane',
+    color: '#3B82F6',
+    tint: '#EBF2FF',
+    sites: 12,
   },
   {
-    id: '4',
-    name: 'Katara Cultural Village',
-    code: 'KAT-2024-CLT',
-    sector: 'Culture',
-    status: 'pending',
-    progress: 35,
+    id: 'p3',
+    name: 'Commercial Property Management',
+    short: 'Corporate',
+    client: 'Corporate Client',
+    description:
+      'End-to-end facility management services ensuring operational efficiency and tenant satisfaction.',
     icon: 'business',
     color: '#8B5CF6',
-    sites: 6,
-    staff: 95,
-    nextMilestone: 'Phase 2 kickoff · Jun 03',
-  },
-  {
-    id: '5',
-    name: 'Qatar Airways HQ',
-    code: 'QA-2024-FM',
-    sector: 'Aviation',
-    status: 'active',
-    progress: 88,
-    icon: 'briefcase',
-    color: '#06B6D4',
-    sites: 3,
-    staff: 110,
-    nextMilestone: 'HVAC quarterly · May 19',
+    tint: '#F1ECFE',
+    sites: 8,
   },
 ];
 
-const STATUS_COLORS = {
-  active:   { bg: '#D1FAE5', text: '#065F46', label: 'Active' },
-  pending:  { bg: '#FEF3C7', text: '#92400E', label: 'Pending' },
-  complete: { bg: '#DBEAFE', text: '#1E40AF', label: 'Complete' },
-};
-
-export default function ProjectsTab({ route }) {
+export default function ProjectsTab({ navigation, route }) {
   const user = route.params?.user || { type: 'guest', name: 'Guest' };
-  const [status, setStatus] = useState('all');
-
-  const filtered = status === 'all'
-    ? PROJECTS
-    : PROJECTS.filter((p) => p.status === status);
 
   return (
     <View style={styles.container}>
       <ScreenHeader
         user={user}
-        title="Projects"
-        subtitle={user.type === 'employee' ? 'Your assigned sites' : 'Our portfolio'}
+        title="Our Projects"
+        subtitle="100+ active engagements"
         rightAction={{ icon: 'options-outline', onPress: () => {} }}
       />
 
@@ -113,114 +67,86 @@ export default function ProjectsTab({ route }) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Stats summary */}
-        <View style={styles.statsCard}>
-          <View style={styles.statsItem}>
-            <Text style={styles.statsValue}>24</Text>
-            <Text style={styles.statsLabel}>Total Projects</Text>
+        {/* Title */}
+        <View style={styles.titleBlock}>
+          <Text style={styles.eyebrow}>OUR PORTFOLIO</Text>
+          <Text style={styles.sectionTitle}>Our Projects</Text>
+          <Text style={styles.sectionSub}>
+            Selected projects that showcase our capability across multiple sectors.
+          </Text>
+        </View>
+
+        {/* Stats strip */}
+        <View style={styles.statsStrip}>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>100+</Text>
+            <Text style={styles.statLabel}>Active Projects</Text>
           </View>
-          <View style={styles.statsDivider} />
-          <View style={styles.statsItem}>
-            <Text style={[styles.statsValue, { color: Colors.success }]}>18</Text>
-            <Text style={styles.statsLabel}>Active</Text>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>235</Text>
+            <Text style={styles.statLabel}>Total Sites</Text>
           </View>
-          <View style={styles.statsDivider} />
-          <View style={styles.statsItem}>
-            <Text style={[styles.statsValue, { color: Colors.accent }]}>1.8K</Text>
-            <Text style={styles.statsLabel}>Staff</Text>
-          </View>
-          <View style={styles.statsDivider} />
-          <View style={styles.statsItem}>
-            <Text style={[styles.statsValue, { color: '#3B82F6' }]}>244</Text>
-            <Text style={styles.statsLabel}>Sites</Text>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>3.5K+</Text>
+            <Text style={styles.statLabel}>Workforce</Text>
           </View>
         </View>
 
-        {/* Status filter pills */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filters}
-        >
-          {STATUSES.map((s) => (
+        {/* Projects */}
+        <View style={styles.list}>
+          {PROJECTS.map((p, idx) => (
             <TouchableOpacity
-              key={s.key}
-              style={[styles.filterPill, status === s.key && styles.filterPillActive]}
-              onPress={() => setStatus(s.key)}
+              key={p.id}
+              style={styles.card}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate('ProjectDetail', { project: p, user })}
             >
-              <Text style={[styles.filterText, status === s.key && styles.filterTextActive]}>
-                {s.label}
-              </Text>
-              <View style={[styles.filterCount, status === s.key && styles.filterCountActive]}>
-                <Text style={[
-                  styles.filterCountText,
-                  status === s.key && styles.filterCountTextActive,
-                ]}>{s.count}</Text>
+              {/* Banner */}
+              <LinearGradient
+                colors={[p.color, p.color + 'E0']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.banner}
+              >
+                <View style={styles.bannerAccent} />
+                <View style={styles.bannerNumber}>
+                  <Text style={styles.bannerNumberText}>0{idx + 1}</Text>
+                </View>
+                <View style={styles.bannerIconWrap}>
+                  <Ionicons name={p.icon} size={32} color={Colors.white} />
+                </View>
+                <View style={styles.bannerTag}>
+                  <Text style={styles.bannerTagText}>{p.short}</Text>
+                </View>
+              </LinearGradient>
+
+              {/* Body */}
+              <View style={styles.body}>
+                <Text style={styles.projectName}>{p.name}</Text>
+
+                <View style={styles.clientRow}>
+                  <Ionicons name="briefcase-outline" size={13} color={Colors.textSecondary} />
+                  <Text style={styles.clientLabel}>Client:</Text>
+                  <Text style={styles.clientName}>{p.client}</Text>
+                </View>
+
+                <Text style={styles.description}>{p.description}</Text>
+
+                <View style={styles.cardFooter}>
+                  <View style={styles.footerLeft}>
+                    <Ionicons name="location-outline" size={13} color={Colors.textSecondary} />
+                    <Text style={styles.footerText}>{p.sites} sites</Text>
+                  </View>
+                  <View style={styles.viewBtn}>
+                    <Text style={styles.viewBtnText}>View Details</Text>
+                    <Ionicons name="arrow-forward" size={13} color={Colors.primary} />
+                  </View>
+                </View>
               </View>
             </TouchableOpacity>
           ))}
-        </ScrollView>
-
-        {/* Project list */}
-        <View style={styles.list}>
-          {filtered.map((p) => {
-            const sc = STATUS_COLORS[p.status];
-            return (
-              <TouchableOpacity key={p.id} style={styles.projectCard} activeOpacity={0.85}>
-                {/* Top row */}
-                <View style={styles.cardTop}>
-                  <View style={[styles.projectIcon, { backgroundColor: p.color + '18' }]}>
-                    <Ionicons name={p.icon} size={22} color={p.color} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <View style={styles.projectHead}>
-                      <Text style={styles.projectName} numberOfLines={1}>{p.name}</Text>
-                      <View style={[styles.statusPill, { backgroundColor: sc.bg }]}>
-                        <Text style={[styles.statusText, { color: sc.text }]}>{sc.label}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.projectMetaRow}>
-                      <Text style={styles.projectCode}>{p.code}</Text>
-                      <Text style={styles.projectDot}>•</Text>
-                      <Text style={styles.projectSector}>{p.sector}</Text>
-                    </View>
-                  </View>
-                </View>
-
-                {/* Progress */}
-                <View style={styles.progressRow}>
-                  <View style={styles.progressInfo}>
-                    <Text style={styles.progressLabel}>Progress</Text>
-                    <Text style={[styles.progressValue, { color: p.color }]}>{p.progress}%</Text>
-                  </View>
-                  <View style={styles.progressBar}>
-                    <View
-                      style={[
-                        styles.progressFill,
-                        { width: `${p.progress}%`, backgroundColor: p.color },
-                      ]}
-                    />
-                  </View>
-                </View>
-
-                {/* Footer */}
-                <View style={styles.cardFooter}>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="location-outline" size={13} color={Colors.textSecondary} />
-                    <Text style={styles.metaText}>{p.sites} sites</Text>
-                  </View>
-                  <View style={styles.metaItem}>
-                    <Ionicons name="people-outline" size={13} color={Colors.textSecondary} />
-                    <Text style={styles.metaText}>{p.staff} staff</Text>
-                  </View>
-                  <View style={[styles.metaItem, styles.milestone]}>
-                    <Ionicons name="flag-outline" size={13} color={Colors.accent} />
-                    <Text style={styles.milestoneText} numberOfLines={1}>{p.nextMilestone}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
         </View>
       </ScrollView>
     </View>
@@ -229,132 +155,166 @@ export default function ProjectsTab({ route }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { paddingBottom: 24 },
+  scroll: { paddingBottom: 32 },
 
-  statsCard: {
+  titleBlock: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+  },
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.accent,
+    letterSpacing: 2,
+    marginBottom: 6,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.text,
+    letterSpacing: -0.4,
+    marginBottom: 6,
+  },
+  sectionSub: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 19,
+  },
+
+  /* Stats strip */
+  statsStrip: {
     flexDirection: 'row',
     backgroundColor: Colors.surface,
     marginHorizontal: Spacing.lg,
-    marginTop: -Spacing.md,
+    marginTop: Spacing.md,
     borderRadius: Radius.md,
     paddingVertical: 16,
-    ...Shadow.md,
-  },
-  statsItem: { flex: 1, alignItems: 'center' },
-  statsValue: { fontSize: 20, fontWeight: '800', color: Colors.primary },
-  statsLabel: { fontSize: 10, color: Colors.textSecondary, marginTop: 2 },
-  statsDivider: { width: 1, backgroundColor: Colors.border },
-
-  filters: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    gap: 8,
-  },
-  filterPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  filterPillActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  filterText: { fontSize: 13, color: Colors.textSecondary, fontWeight: '600' },
-  filterTextActive: { color: Colors.white },
-  filterCount: {
-    minWidth: 22,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 10,
-    backgroundColor: Colors.background,
-  },
-  filterCountActive: { backgroundColor: 'rgba(255,255,255,0.2)' },
-  filterCountText: { fontSize: 10, fontWeight: '700', color: Colors.textSecondary, textAlign: 'center' },
-  filterCountTextActive: { color: Colors.white },
-
-  list: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.md,
-    gap: 12,
-  },
-  projectCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.md,
-    padding: 14,
     ...Shadow.sm,
   },
-  cardTop: { flexDirection: 'row', gap: 12, marginBottom: 14 },
-  projectIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+  statBox: { flex: 1, alignItems: 'center' },
+  statValue: { fontSize: 19, fontWeight: '800', color: Colors.primary, letterSpacing: -0.3 },
+  statLabel: { fontSize: 11, color: Colors.textSecondary, marginTop: 2, fontWeight: '600' },
+  statDivider: { width: 1, backgroundColor: Colors.border },
+
+  /* Project cards */
+  list: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    gap: 14,
+  },
+  card: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+    ...Shadow.md,
+  },
+  banner: {
+    height: 110,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  bannerAccent: {
+    position: 'absolute',
+    top: -40,
+    right: -40,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  bannerNumber: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+  },
+  bannerNumberText: {
+    fontSize: 56,
+    fontWeight: '900',
+    color: 'rgba(255,255,255,0.18)',
+    letterSpacing: -2,
+  },
+  bannerIconWrap: {
+    width: 54,
+    height: 54,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.18)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  projectHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    justifyContent: 'space-between',
-  },
-  projectName: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-  },
-  statusPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+  bannerTag: {
+    position: 'absolute',
+    bottom: 12,
+    left: Spacing.md,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: Radius.full,
   },
-  statusText: { fontSize: 10, fontWeight: '700', letterSpacing: 0.4 },
-  projectMetaRow: {
+  bannerTagText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.white,
+    letterSpacing: 1,
+  },
+
+  body: {
+    padding: Spacing.md,
+  },
+  projectName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.text,
+    lineHeight: 21,
+    marginBottom: 8,
+    letterSpacing: -0.2,
+  },
+  clientRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 3,
+    gap: 5,
+    marginBottom: 8,
   },
-  projectCode: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600', letterSpacing: 0.5 },
-  projectDot: { color: Colors.textLight },
-  projectSector: { fontSize: 11, color: Colors.textSecondary },
-
-  progressRow: { marginBottom: 12 },
-  progressInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
+  clientLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '500',
   },
-  progressLabel: { fontSize: 11, color: Colors.textSecondary, fontWeight: '500' },
-  progressValue: { fontSize: 12, fontWeight: '800' },
-  progressBar: {
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: Colors.border,
-    overflow: 'hidden',
+  clientName: {
+    fontSize: 12,
+    color: Colors.text,
+    fontWeight: '700',
   },
-  progressFill: { height: '100%', borderRadius: 3 },
-
+  description: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
   cardFooter: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 12,
     paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
-  metaItem: {
+  footerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
-  metaText: { fontSize: 11, color: Colors.textSecondary, fontWeight: '500' },
-  milestone: { flex: 1, justifyContent: 'flex-end' },
-  milestoneText: { fontSize: 11, color: Colors.accent, fontWeight: '600' },
+  footerText: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600' },
+  viewBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  viewBtnText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '700',
+  },
 });

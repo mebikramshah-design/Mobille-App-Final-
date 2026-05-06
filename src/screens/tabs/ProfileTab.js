@@ -5,66 +5,26 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,
+  Linking,
   Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radius, Shadow } from '../../theme';
 
-const SECTIONS = [
-  {
-    title: 'Account',
-    items: [
-      { icon: 'person-outline',          label: 'Personal Information', chevron: true },
-      { icon: 'shield-checkmark-outline', label: 'Security & Password',  chevron: true },
-      { icon: 'card-outline',            label: 'Employee Details',     chevron: true, employeeOnly: true },
-    ],
-  },
-  {
-    title: 'Preferences',
-    items: [
-      { icon: 'notifications-outline', label: 'Push Notifications',  toggle: true, value: true },
-      { icon: 'mail-outline',          label: 'Email Updates',       toggle: true, value: true },
-      { icon: 'finger-print-outline',  label: 'Biometric Login',     toggle: true, value: false, employeeOnly: true },
-      { icon: 'language-outline',      label: 'Language',            chevron: true, hint: 'English' },
-    ],
-  },
-  {
-    title: 'Support',
-    items: [
-      { icon: 'help-circle-outline',     label: 'Help Center',        chevron: true },
-      { icon: 'chatbubbles-outline',     label: 'Contact Support',    chevron: true },
-      { icon: 'document-text-outline',   label: 'Terms of Service',   chevron: true },
-      { icon: 'lock-closed-outline',     label: 'Privacy Policy',     chevron: true },
-    ],
-  },
+const VALUES = [
+  { icon: 'shield-checkmark', label: 'Integrity',  desc: 'We do the right thing',                     color: '#3B82F6' },
+  { icon: 'star',             label: 'Excellence', desc: 'We deliver quality in everything we do',    color: '#C9A84C' },
+  { icon: 'bulb',             label: 'Innovation', desc: 'We continuously improve',                   color: '#8B5CF6' },
+  { icon: 'people',           label: 'Teamwork',   desc: 'We achieve more together',                  color: '#10B981' },
 ];
 
-function ProfileRow({ item }) {
-  const [on, setOn] = React.useState(item.value);
-  return (
-    <TouchableOpacity style={styles.row} activeOpacity={item.toggle ? 1 : 0.7}>
-      <View style={styles.rowIcon}>
-        <Ionicons name={item.icon} size={18} color={Colors.primary} />
-      </View>
-      <Text style={styles.rowLabel}>{item.label}</Text>
-      {item.toggle ? (
-        <Switch
-          value={on}
-          onValueChange={setOn}
-          trackColor={{ false: Colors.border, true: Colors.primary }}
-          thumbColor={Colors.white}
-        />
-      ) : (
-        <>
-          {item.hint ? <Text style={styles.rowHint}>{item.hint}</Text> : null}
-          {item.chevron ? <Ionicons name="chevron-forward" size={16} color={Colors.textLight} /> : null}
-        </>
-      )}
-    </TouchableOpacity>
-  );
-}
+const CERTIFICATIONS = [
+  { code: 'ISO 9001',  title: 'Quality Management',          color: '#3B82F6' },
+  { code: 'ISO 14001', title: 'Environmental Management',    color: '#10B981' },
+  { code: 'ISO 45001', title: 'Occupational Health & Safety', color: '#EF4444' },
+  { code: 'ISO 41001', title: 'Facility Management Standards', color: '#8B5CF6' },
+];
 
 export default function ProfileTab({ navigation, route }) {
   const user = route.params?.user || { type: 'guest', name: 'Guest', email: '' };
@@ -99,7 +59,6 @@ export default function ProfileTab({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        {/* Profile card */}
         <View style={styles.profileCard}>
           <View style={styles.avatarLarge}>
             <Text style={styles.avatarLargeText}>{initial}</Text>
@@ -110,7 +69,6 @@ export default function ProfileTab({ navigation, route }) {
             )}
           </View>
           <Text style={styles.profileName}>{user.name || 'User'}</Text>
-
           <View style={styles.profileType}>
             <Ionicons
               name={isEmployee ? 'briefcase' : 'person'}
@@ -121,27 +79,6 @@ export default function ProfileTab({ navigation, route }) {
               {isEmployee ? `Employee · ${user.employeeId || 'DI-XXXX-XXX'}` : 'Guest User'}
             </Text>
           </View>
-
-          {isEmployee ? (
-            <View style={styles.contactRow}>
-              <View style={styles.contactItem}>
-                <Ionicons name="call" size={12} color="rgba(255,255,255,0.65)" />
-                <Text style={styles.contactText}>{user.mobile || '+974 ••••'}</Text>
-              </View>
-              <View style={styles.contactDivider} />
-              <View style={styles.contactItem}>
-                <Ionicons name="location" size={12} color="rgba(255,255,255,0.65)" />
-                <Text style={styles.contactText}>Doha, Qatar</Text>
-              </View>
-            </View>
-          ) : (
-            <View style={styles.contactRow}>
-              <View style={styles.contactItem}>
-                <Ionicons name="mail" size={12} color="rgba(255,255,255,0.65)" />
-                <Text style={styles.contactText}>{user.email || ''}</Text>
-              </View>
-            </View>
-          )}
         </View>
       </LinearGradient>
 
@@ -149,46 +86,148 @@ export default function ProfileTab({ navigation, route }) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Stat tiles — employee only */}
-        {isEmployee && (
-          <View style={styles.tileRow}>
-            <View style={[styles.tile, { backgroundColor: '#EEF2FF' }]}>
-              <Ionicons name="checkmark-done" size={20} color={Colors.primary} />
-              <Text style={styles.tileValue}>248</Text>
-              <Text style={styles.tileLabel}>Tasks Done</Text>
+        {/* Company Overview */}
+        <View style={styles.section}>
+          <Text style={styles.eyebrow}>WHO WE ARE</Text>
+          <Text style={styles.sectionTitle}>Company Overview</Text>
+          <View style={styles.overviewCard}>
+            <View style={styles.overviewIcon}>
+              <Ionicons name="business" size={22} color={Colors.primary} />
             </View>
-            <View style={[styles.tile, { backgroundColor: '#FFF8E7' }]}>
-              <Ionicons name="trophy" size={20} color={Colors.accent} />
-              <Text style={styles.tileValue}>3</Text>
-              <Text style={styles.tileLabel}>Awards</Text>
+            <Text style={styles.overviewText}>
+              Darwish Interserve is a 100% Qatari-owned integrated facilities
+              management company delivering world-class services across multiple
+              sectors.
+            </Text>
+          </View>
+        </View>
+
+        {/* Vision & Mission */}
+        <View style={styles.section}>
+          <Text style={styles.eyebrow}>OUR PURPOSE</Text>
+          <Text style={styles.sectionTitle}>Vision & Mission</Text>
+
+          <View style={styles.vmRow}>
+            <View style={[styles.vmCard, { backgroundColor: '#EEF2FF' }]}>
+              <View style={[styles.vmIcon, { backgroundColor: Colors.primary }]}>
+                <Ionicons name="eye" size={18} color={Colors.white} />
+              </View>
+              <Text style={styles.vmLabel}>VISION</Text>
+              <Text style={styles.vmText}>
+                To be the leading facilities management provider in Qatar,
+                delivering excellence through innovation, quality, and
+                customer satisfaction.
+              </Text>
             </View>
-            <View style={[styles.tile, { backgroundColor: '#D1FAE5' }]}>
-              <Ionicons name="time" size={20} color={Colors.success} />
-              <Text style={styles.tileValue}>1.2y</Text>
-              <Text style={styles.tileLabel}>Tenure</Text>
+
+            <View style={[styles.vmCard, { backgroundColor: '#FFF8E7' }]}>
+              <View style={[styles.vmIcon, { backgroundColor: Colors.accent }]}>
+                <Ionicons name="flag" size={18} color={Colors.white} />
+              </View>
+              <Text style={[styles.vmLabel, { color: Colors.accent }]}>MISSION</Text>
+              <Text style={styles.vmText}>
+                To provide reliable and efficient facilities management services
+                while maintaining the highest standards of safety, quality, and
+                sustainability.
+              </Text>
             </View>
           </View>
-        )}
+        </View>
 
-        {/* Sections */}
-        {SECTIONS.map((section) => {
-          const items = section.items.filter((i) => !i.employeeOnly || isEmployee);
-          if (items.length === 0) return null;
+        {/* Core Values */}
+        <View style={styles.section}>
+          <Text style={styles.eyebrow}>WHAT DRIVES US</Text>
+          <Text style={styles.sectionTitle}>Core Values</Text>
 
-          return (
-            <View key={section.title} style={styles.section}>
-              <Text style={styles.sectionTitle}>{section.title}</Text>
-              <View style={styles.card}>
-                {items.map((item, idx) => (
-                  <View key={item.label}>
-                    <ProfileRow item={item} />
-                    {idx < items.length - 1 && <View style={styles.rowDivider} />}
-                  </View>
-                ))}
+          <View style={styles.valuesList}>
+            {VALUES.map((v, idx) => (
+              <View
+                key={v.label}
+                style={[
+                  styles.valueRow,
+                  idx === VALUES.length - 1 && { borderBottomWidth: 0 },
+                ]}
+              >
+                <View style={[styles.valueIcon, { backgroundColor: v.color + '18' }]}>
+                  <Ionicons name={v.icon} size={20} color={v.color} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.valueLabel}>{v.label}</Text>
+                  <Text style={styles.valueDesc}>{v.desc}</Text>
+                </View>
               </View>
-            </View>
-          );
-        })}
+            ))}
+          </View>
+        </View>
+
+        {/* Certifications */}
+        <View style={styles.section}>
+          <Text style={styles.eyebrow}>CERTIFIED EXCELLENCE</Text>
+          <Text style={styles.sectionTitle}>Certifications</Text>
+
+          <View style={styles.certGrid}>
+            {CERTIFICATIONS.map((c) => (
+              <View key={c.code} style={styles.certCard}>
+                <View style={[styles.certBadge, { borderColor: c.color }]}>
+                  <Ionicons name="ribbon" size={20} color={c.color} />
+                </View>
+                <Text style={[styles.certCode, { color: c.color }]}>{c.code}</Text>
+                <Text style={styles.certTitle}>{c.title}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Contact */}
+        <View style={styles.section}>
+          <Text style={styles.eyebrow}>GET IN TOUCH</Text>
+          <Text style={styles.sectionTitle}>Contact Information</Text>
+
+          <View style={styles.contactList}>
+            <TouchableOpacity style={styles.contactRow}>
+              <View style={[styles.contactIcon, { backgroundColor: '#FFEEEE' }]}>
+                <Ionicons name="location" size={18} color={Colors.error} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.contactLabel}>Office</Text>
+                <Text style={styles.contactValue}>Doha, Qatar</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textLight} />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.contactRow}
+              onPress={() => Linking.openURL('mailto:info@darwishinterserve.com')}
+            >
+              <View style={[styles.contactIcon, { backgroundColor: '#EBF2FF' }]}>
+                <Ionicons name="mail" size={18} color="#3B82F6" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.contactLabel}>Email</Text>
+                <Text style={styles.contactValue}>info@darwishinterserve.com</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textLight} />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.contactRow}
+              onPress={() => Linking.openURL('tel:+974XXXXXXXX')}
+            >
+              <View style={[styles.contactIcon, { backgroundColor: '#E6FBF3' }]}>
+                <Ionicons name="call" size={18} color={Colors.success} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.contactLabel}>Phone</Text>
+                <Text style={styles.contactValue}>+974 XXX XXXX</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textLight} />
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Logout */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
@@ -196,7 +235,7 @@ export default function ProfileTab({ navigation, route }) {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>Darwish Interserve v1.0.0</Text>
+        <Text style={styles.version}>Darwish Interserve · v1.0.0</Text>
       </ScrollView>
     </View>
   );
@@ -205,16 +244,17 @@ export default function ProfileTab({ navigation, route }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
 
+  /* Header */
   headerGradient: {
     paddingTop: 52,
     paddingHorizontal: Spacing.lg,
-    paddingBottom: 64,
+    paddingBottom: 40,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   headerTitle: { fontSize: 22, fontWeight: '700', color: Colors.white, letterSpacing: -0.3 },
   headerBtn: {
@@ -222,20 +262,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center', alignItems: 'center',
   },
-
   profileCard: { alignItems: 'center' },
   avatarLarge: {
-    width: 86,
-    height: 86,
-    borderRadius: 43,
+    width: 76, height: 76,
+    borderRadius: 38,
     backgroundColor: Colors.accent,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'center', alignItems: 'center',
     borderWidth: 3,
     borderColor: 'rgba(255,255,255,0.25)',
     position: 'relative',
   },
-  avatarLargeText: { fontSize: 36, fontWeight: '800', color: Colors.primary },
+  avatarLargeText: { fontSize: 30, fontWeight: '800', color: Colors.primary },
   verifiedBadge: {
     position: 'absolute',
     bottom: 0,
@@ -243,13 +280,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 12,
   },
-  profileName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: Colors.white,
-    marginTop: 12,
-    letterSpacing: -0.3,
-  },
+  profileName: { fontSize: 20, fontWeight: '700', color: Colors.white, marginTop: 10 },
   profileType: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -261,76 +292,175 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   profileTypeText: { fontSize: 11, color: Colors.accentLight, fontWeight: '700', letterSpacing: 0.5 },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 10,
-  },
-  contactItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  contactText: { fontSize: 12, color: 'rgba(255,255,255,0.7)' },
-  contactDivider: { width: 1, height: 12, backgroundColor: 'rgba(255,255,255,0.25)' },
 
   scroll: { paddingBottom: 32 },
 
-  tileRow: {
-    flexDirection: 'row',
-    gap: 10,
+  /* Section */
+  section: {
     paddingHorizontal: Spacing.lg,
-    marginTop: -40,
+    paddingTop: Spacing.lg,
   },
-  tile: {
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.accent,
+    letterSpacing: 2,
+    marginBottom: 6,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+    letterSpacing: -0.3,
+    marginBottom: 12,
+  },
+
+  /* Overview */
+  overviewCard: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    padding: 14,
+    gap: 12,
+    alignItems: 'flex-start',
+    marginTop: -20,
+    ...Shadow.md,
+  },
+  overviewIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: '#EEF2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overviewText: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+
+  /* Vision & Mission */
+  vmRow: { flexDirection: 'row', gap: 10 },
+  vmCard: {
     flex: 1,
     borderRadius: Radius.md,
     padding: 14,
+  },
+  vmIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 4,
-    ...Shadow.md,
+    marginBottom: 10,
   },
-  tileValue: { fontSize: 18, fontWeight: '800', color: Colors.text },
-  tileLabel: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600' },
-
-  section: {
-    marginTop: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
+  vmLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.primary,
+    letterSpacing: 1.5,
+    marginBottom: 6,
   },
-  sectionTitle: {
+  vmText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: Colors.textSecondary,
-    letterSpacing: 1,
-    marginBottom: 8,
-    paddingHorizontal: 4,
+    color: Colors.text,
+    lineHeight: 18,
   },
-  card: {
+
+  /* Values */
+  valuesList: {
     backgroundColor: Colors.surface,
     borderRadius: Radius.md,
     overflow: 'hidden',
     ...Shadow.sm,
   },
-  row: {
+  valueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  valueIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  valueLabel: { fontSize: 14, fontWeight: '700', color: Colors.text },
+  valueDesc: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+
+  /* Certifications */
+  certGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  certCard: {
+    width: '47.5%',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    padding: 14,
+    alignItems: 'center',
+    gap: 6,
+    ...Shadow.sm,
+  },
+  certBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  certCode: {
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  certTitle: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    fontWeight: '600',
+    lineHeight: 15,
+  },
+
+  /* Contact */
+  contactList: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    overflow: 'hidden',
+    ...Shadow.sm,
+  },
+  contactRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 14,
     gap: 12,
   },
-  rowIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: '#EEF2FF',
+  contactIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rowLabel: { flex: 1, fontSize: 14, fontWeight: '500', color: Colors.text },
-  rowHint: { fontSize: 12, color: Colors.textSecondary, marginRight: 4 },
-  rowDivider: {
+  contactLabel: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600' },
+  contactValue: { fontSize: 14, fontWeight: '700', color: Colors.text, marginTop: 2 },
+  divider: {
     height: 1,
     backgroundColor: Colors.border,
-    marginLeft: 58,
+    marginLeft: 64,
   },
 
+  /* Logout */
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',

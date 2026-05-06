@@ -7,6 +7,7 @@ import GuestLoginScreen from '../screens/guest/GuestLoginScreen';
 import GuestOTPScreen from '../screens/guest/GuestOTPScreen';
 import EmployeeRegisterScreen from '../screens/employee/EmployeeRegisterScreen';
 import EmployeeOTPScreen from '../screens/employee/EmployeeOTPScreen';
+import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import MainTabs from './MainTabs';
 
 const Stack = createNativeStackNavigator();
@@ -30,6 +31,13 @@ export default function AppNavigator() {
           name="Main"
           component={MainTabs}
           options={{ animation: 'fade' }}
+        />
+
+        {/* Detail screens (over the tabs) */}
+        <Stack.Screen
+          name="ProjectDetail"
+          component={ProjectDetailScreen}
+          options={{ animation: 'slide_from_bottom' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

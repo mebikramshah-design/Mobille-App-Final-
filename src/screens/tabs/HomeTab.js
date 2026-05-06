@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,30 +12,46 @@ import ScreenHeader from '../../components/ScreenHeader';
 import { Colors, Spacing, Radius, Shadow } from '../../theme';
 
 const SERVICES = [
-  { icon: 'construct-outline', label: 'Hard FM',     color: '#3B82F6' },
-  { icon: 'leaf-outline',      label: 'Soft FM',     color: '#10B981' },
-  { icon: 'shield-outline',    label: 'Security',    color: '#EF4444' },
-  { icon: 'flash-outline',     label: 'MEP',         color: '#F59E0B' },
-  { icon: 'water-outline',     label: 'Cleaning',    color: '#06B6D4' },
-  { icon: 'leaf-sharp',        label: 'Landscaping', color: '#84CC16' },
+  {
+    icon: 'construct',
+    title: 'Hard Services',
+    description: 'Mechanical, Electrical, HVAC, Plumbing, and Civil maintenance solutions ensuring efficient and reliable operations.',
+    color: '#3B82F6',
+    tint: '#EBF2FF',
+  },
+  {
+    icon: 'leaf',
+    title: 'Soft Services',
+    description: 'Cleaning, landscaping, pest control, and support services designed to maintain safe and comfortable environments.',
+    color: '#10B981',
+    tint: '#E6FBF3',
+  },
+  {
+    icon: 'settings',
+    title: 'Managed Services',
+    description: 'Integrated FM solutions including energy management, consulting, and compliance with international standards.',
+    color: '#8B5CF6',
+    tint: '#F1ECFE',
+  },
 ];
 
-const EMP_QUICK = [
-  { icon: 'clipboard-outline', label: 'Work Orders',  badge: 3 },
-  { icon: 'time-outline',      label: 'Clock In',     badge: null },
-  { icon: 'calendar-outline',  label: 'My Schedule',  badge: null },
-  { icon: 'document-outline',  label: 'Reports',      badge: 1 },
+const HIGHLIGHTS = [
+  { value: '3500+',  label: 'Skilled Employees',     icon: 'people',    color: '#3B82F6' },
+  { value: '100+',   label: 'Active Projects',       icon: 'briefcase', color: '#C9A84C' },
+  { value: '14+',    label: 'Years of Experience',   icon: 'trophy',    color: '#10B981' },
+  { value: 'Qatar',  label: 'Operating Nationwide',  icon: 'location',  color: '#EF4444' },
 ];
 
-const STATS = [
-  { value: '14+',  label: 'Years in Qatar' },
-  { value: '85%',  label: 'Public Schools' },
-  { value: '7K+',  label: 'Staff Strength' },
+const CLIENT_LOGOS = [
+  { initials: 'HIA', label: 'Aviation', color: '#3B82F6' },
+  { initials: 'QU',  label: 'Education', color: '#10B981' },
+  { initials: 'KAT', label: 'Cultural',  color: '#8B5CF6' },
+  { initials: 'AZ',  label: 'Sports',    color: '#F59E0B' },
+  { initials: '+',   label: '20 more',   color: Colors.textLight },
 ];
 
 export default function HomeTab({ navigation, route }) {
   const user = route.params?.user || { type: 'guest', name: 'Guest' };
-  const isEmployee = user.type === 'employee';
   const firstName = (user.name || '').split(' ')[0] || 'there';
 
   const hour = new Date().getHours();
@@ -48,14 +63,18 @@ export default function HomeTab({ navigation, route }) {
         user={user}
         title={`${greeting},`}
         subtitle={firstName}
-        rightAction={{ icon: 'notifications-outline', onPress: () => {}, badge: isEmployee ? 5 : null }}
+        rightAction={{
+          icon: 'notifications-outline',
+          onPress: () => {},
+          badge: user.type === 'employee' ? 5 : null,
+        }}
       />
 
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero card */}
+        {/* ── HERO ── */}
         <View style={styles.heroWrap}>
           <LinearGradient
             colors={[Colors.primary, Colors.primaryLight]}
@@ -64,80 +83,121 @@ export default function HomeTab({ navigation, route }) {
             style={styles.hero}
           >
             <View style={styles.heroAccent} />
-            <Text style={styles.heroLabel}>QATAR'S LEADING FM COMPANY</Text>
-            <Text style={styles.heroTitle}>Excellence{'\n'}in Every Detail</Text>
-            <Text style={styles.heroBody}>
-              {isEmployee
-                ? "Your work powers Qatar's most trusted facilities. Stay connected, stay productive."
-                : 'Discover our integrated facility management services across Qatar.'}
-            </Text>
-            <View style={styles.statsRow}>
-              {STATS.map((s) => (
-                <View key={s.label} style={styles.statBox}>
-                  <Text style={styles.statValue}>{s.value}</Text>
-                  <Text style={styles.statLabel}>{s.label}</Text>
-                </View>
-              ))}
+            <View style={styles.heroAccentSm} />
+
+            <View style={styles.heroEyebrowRow}>
+              <View style={styles.heroDivider} />
+              <Text style={styles.heroEyebrow}>WELCOME TO DIFM</Text>
             </View>
+
+            <Text style={styles.heroTitle}>
+              Redefining the Future{'\n'}for People and Places
+            </Text>
+            <Text style={styles.heroSubtitle}>
+              Your Trusted Facilities Management Partner in Qatar
+            </Text>
           </LinearGradient>
         </View>
 
-        {/* Quick actions — employee only */}
-        {isEmployee && (
-          <>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <View style={styles.quickRow}>
-              {EMP_QUICK.map((q) => (
-                <TouchableOpacity key={q.label} style={styles.quickCard}>
-                  {q.badge ? (
-                    <View style={styles.quickBadge}>
-                      <Text style={styles.quickBadgeText}>{q.badge}</Text>
-                    </View>
-                  ) : null}
-                  <View style={styles.quickIcon}>
-                    <Ionicons name={q.icon} size={22} color={Colors.primary} />
-                  </View>
-                  <Text style={styles.quickLabel}>{q.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </>
-        )}
+        {/* ── ABOUT ── */}
+        <View style={styles.section}>
+          <Text style={styles.sectionEyebrow}>ABOUT US</Text>
+          <Text style={styles.sectionTitle}>
+            A leading integrated FM company
+          </Text>
+          <Text style={styles.sectionBody}>
+            Darwish Interserve is a leading integrated facilities management
+            company in Qatar, established in 2010. With a highly skilled
+            workforce, we deliver high-quality services across commercial,
+            residential, and government sectors.
+          </Text>
+        </View>
 
-        {/* Services */}
-        <View style={styles.sectionRow}>
+        {/* ── SERVICES ── */}
+        <View style={styles.section}>
+          <Text style={styles.sectionEyebrow}>WHAT WE DO</Text>
           <Text style={styles.sectionTitle}>Our Services</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAll}>See all</Text>
+
+          <View style={styles.servicesList}>
+            {SERVICES.map((s, idx) => (
+              <TouchableOpacity
+                key={s.title}
+                style={[styles.serviceCard, idx === SERVICES.length - 1 && { marginBottom: 0 }]}
+                activeOpacity={0.85}
+              >
+                <View style={[styles.serviceIcon, { backgroundColor: s.tint }]}>
+                  <Ionicons name={s.icon} size={26} color={s.color} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.serviceTitle}>{s.title}</Text>
+                  <Text style={styles.serviceDesc}>{s.description}</Text>
+                </View>
+                <View style={[styles.serviceArrow, { backgroundColor: s.tint }]}>
+                  <Ionicons name="arrow-forward" size={14} color={s.color} />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* ── HIGHLIGHTS ── */}
+        <View style={[styles.section, { backgroundColor: Colors.surface, paddingVertical: 22 }]}>
+          <Text style={[styles.sectionEyebrow, { textAlign: 'center' }]}>BY THE NUMBERS</Text>
+          <Text style={[styles.sectionTitle, { textAlign: 'center', marginBottom: 18 }]}>
+            Company Highlights
+          </Text>
+
+          <View style={styles.highlightsGrid}>
+            {HIGHLIGHTS.map((h) => (
+              <View key={h.label} style={styles.highlightCard}>
+                <View style={[styles.highlightIcon, { backgroundColor: h.color + '18' }]}>
+                  <Ionicons name={h.icon} size={20} color={h.color} />
+                </View>
+                <Text style={[styles.highlightValue, { color: h.color }]}>{h.value}</Text>
+                <Text style={styles.highlightLabel}>{h.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* ── CLIENTS ── */}
+        <View style={styles.section}>
+          <Text style={styles.sectionEyebrow}>OUR CLIENTS</Text>
+          <Text style={styles.sectionTitle}>Trusted by leaders</Text>
+          <Text style={styles.sectionBody}>
+            Trusted by leading organizations across Qatar, including aviation,
+            government, and commercial sectors.
+          </Text>
+
+          <View style={styles.clientsRow}>
+            {CLIENT_LOGOS.map((c, i) => (
+              <View key={i} style={styles.clientCard}>
+                <View style={[styles.clientLogo, { backgroundColor: c.color + '18' }]}>
+                  <Text style={[styles.clientInitials, { color: c.color }]}>{c.initials}</Text>
+                </View>
+                <Text style={styles.clientLabel}>{c.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* ── CTA ── */}
+        <View style={styles.ctaSection}>
+          <TouchableOpacity
+            style={styles.ctaPrimary}
+            activeOpacity={0.85}
+            onPress={() => navigation?.navigate?.('Projects')}
+          >
+            <Ionicons name="briefcase" size={18} color={Colors.white} />
+            <Text style={styles.ctaPrimaryText}>Explore Our Projects</Text>
+            <Ionicons name="arrow-forward" size={16} color={Colors.white} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.ctaSecondary} activeOpacity={0.85}>
+            <Ionicons name="call-outline" size={18} color={Colors.primary} />
+            <Text style={styles.ctaSecondaryText}>Contact Us Today</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.grid}>
-          {SERVICES.map((s) => (
-            <TouchableOpacity key={s.label} style={styles.serviceCard}>
-              <View style={[styles.serviceIcon, { backgroundColor: s.color + '18' }]}>
-                <Ionicons name={s.icon} size={22} color={s.color} />
-              </View>
-              <Text style={styles.serviceLabel}>{s.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Featured client */}
-        <Text style={styles.sectionTitle}>Featured Client</Text>
-        <TouchableOpacity style={styles.featuredCard}>
-          <View style={styles.featuredLeft}>
-            <View style={styles.featuredIcon}>
-              <Ionicons name="airplane" size={22} color={Colors.accent} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.featuredTitle}>Hamad International Airport</Text>
-              <Text style={styles.featuredBody}>
-                Integrated FM services for one of the world's leading airports.
-              </Text>
-            </View>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -146,148 +206,233 @@ export default function HomeTab({ navigation, route }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   scroll: { paddingBottom: 24 },
+
+  /* Hero */
   heroWrap: { paddingHorizontal: Spacing.lg, marginTop: -Spacing.md },
   hero: {
     borderRadius: Radius.lg,
     padding: Spacing.lg,
+    paddingVertical: 28,
     overflow: 'hidden',
     ...Shadow.md,
   },
   heroAccent: {
     position: 'absolute',
-    top: -60,
-    right: -60,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    top: -80,
+    right: -80,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
     backgroundColor: Colors.accent,
     opacity: 0.18,
   },
-  heroLabel: {
+  heroAccentSm: {
+    position: 'absolute',
+    bottom: -40,
+    left: -40,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  heroEyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 14,
+  },
+  heroDivider: {
+    width: 24,
+    height: 2,
+    backgroundColor: Colors.accent,
+    borderRadius: 1,
+  },
+  heroEyebrow: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '800',
     color: Colors.accentLight,
-    letterSpacing: 1.5,
+    letterSpacing: 2,
   },
   heroTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800',
     color: Colors.white,
-    marginTop: 8,
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
     lineHeight: 30,
   },
-  heroBody: {
+  heroSubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.75)',
+    color: 'rgba(255,255,255,0.78)',
     marginTop: 8,
-    marginBottom: 16,
     lineHeight: 20,
   },
-  statsRow: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: Radius.md,
-    padding: 12,
-  },
-  statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 18, fontWeight: '800', color: Colors.accent },
-  statLabel: { fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 2, textAlign: 'center' },
-  sectionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+
+  /* Section */
+  section: {
     paddingHorizontal: Spacing.lg,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.sm,
+    paddingTop: 28,
+  },
+  sectionEyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.accent,
+    letterSpacing: 2,
+    marginBottom: 6,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '700',
     color: Colors.text,
-    paddingHorizontal: Spacing.lg,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.sm,
+    letterSpacing: -0.3,
+    marginBottom: 8,
   },
-  seeAll: { fontSize: 13, color: Colors.primary, fontWeight: '600' },
-  quickRow: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingHorizontal: Spacing.lg,
+  sectionBody: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    lineHeight: 21,
+    marginBottom: 14,
   },
-  quickCard: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.md,
-    padding: 12,
-    alignItems: 'center',
-    gap: 6,
-    position: 'relative',
-    ...Shadow.sm,
-  },
-  quickBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: Colors.error,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  quickBadgeText: { fontSize: 10, fontWeight: '700', color: Colors.white },
-  quickIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    backgroundColor: '#EEF2FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  quickLabel: { fontSize: 11, fontWeight: '600', color: Colors.text, textAlign: 'center' },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    paddingHorizontal: Spacing.lg,
-  },
+
+  /* Services */
+  servicesList: { marginTop: 6 },
   serviceCard: {
-    width: '31.5%',
+    flexDirection: 'row',
     backgroundColor: Colors.surface,
     borderRadius: Radius.md,
     padding: 14,
+    marginBottom: 10,
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
     ...Shadow.sm,
   },
   serviceIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  serviceLabel: { fontSize: 11, fontWeight: '600', color: Colors.text, textAlign: 'center' },
-  featuredCard: {
+  serviceTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 3,
+  },
+  serviceDesc: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 17,
+  },
+  serviceArrow: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  /* Highlights */
+  highlightsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  highlightCard: {
+    width: '47.5%',
+    backgroundColor: Colors.background,
+    borderRadius: Radius.md,
+    padding: 14,
+    alignItems: 'flex-start',
+    gap: 6,
+  },
+  highlightIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  highlightValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+  },
+  highlightLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+
+  /* Clients */
+  clientsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 4,
+  },
+  clientCard: {
+    width: '18%',
+    alignItems: 'center',
+    gap: 5,
+  },
+  clientLogo: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  clientInitials: {
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  clientLabel: {
+    fontSize: 9,
+    color: Colors.textSecondary,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  /* CTA */
+  ctaSection: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    gap: 10,
+  },
+  ctaPrimary: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.md,
-    padding: Spacing.md,
-    marginHorizontal: Spacing.lg,
-    ...Shadow.sm,
-  },
-  featuredLeft: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  featuredIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: '#FFF8E7',
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    paddingVertical: 14,
+    borderRadius: Radius.md,
+    gap: 10,
+    ...Shadow.md,
   },
-  featuredTitle: { fontSize: 14, fontWeight: '700', color: Colors.text },
-  featuredBody: { fontSize: 12, color: Colors.textSecondary, marginTop: 2, lineHeight: 18 },
+  ctaPrimaryText: {
+    color: Colors.white,
+    fontSize: 15,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+    marginLeft: -10,
+  },
+  ctaSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    paddingVertical: 13,
+    borderRadius: Radius.md,
+    gap: 8,
+  },
+  ctaSecondaryText: {
+    color: Colors.primary,
+    fontSize: 15,
+    fontWeight: '700',
+  },
 });
