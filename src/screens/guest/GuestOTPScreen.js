@@ -12,6 +12,7 @@ import Logo from '../../components/Logo';
 import PrimaryButton from '../../components/PrimaryButton';
 import OTPInput from '../../components/OTPInput';
 import { Colors, Spacing, Radius } from '../../theme';
+import { verifyEmailOTP, sendEmailOTP } from '../../config/api';
 
 const RESEND_COOLDOWN = 60;
 
@@ -52,20 +53,22 @@ export default function GuestOTPScreen({ navigation, route }) {
     setVerifyError('');
     setLoading(true);
 
-    // Simulate OTP verification — demo code is 123456
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-
-    if (otp !== '123456') {
-      setVerifyError('Invalid code. Please check your Gmail and try again.');
+    try {
+      const data = await verifyEmailOTP(gmail, otp);
+      if (!data.valid) {
+        setVerifyError(data.message || 'Invalid code. Please try again.');
+        shake();
+        return;
+      }
+      navigation.replace('Main', {
+        user: { type: 'guest', name, email: gmail },
+      });
+    } catch {
+      setVerifyError('Network error. Make sure the server is running.');
       shake();
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    // Success — enter the main tab navigator
-    navigation.replace('Main', {
-      user: { type: 'guest', name, email: gmail },
-    });
   };
 
   const handleResend = async () => {
@@ -73,9 +76,15 @@ export default function GuestOTPScreen({ navigation, route }) {
     setResending(true);
     setOtp('');
     setVerifyError('');
-    await new Promise((r) => setTimeout(r, 1000));
-    setResending(false);
-    setCountdown(RESEND_COOLDOWN);
+    try {
+      const data = await sendEmailOTP(gmail, name);
+      if (!data.success) setVerifyError(data.message || 'Failed to resend code.');
+    } catch {
+      setVerifyError('Network error while resending.');
+    } finally {
+      setResending(false);
+      setCountdown(RESEND_COOLDOWN);
+    }
   };
 
   const maskedGmail = gmail.replace(/(.{2})(.+)(@gmail\.com)/, '$1****$3');

@@ -14,6 +14,7 @@ import Logo from '../../components/Logo';
 import PrimaryButton from '../../components/PrimaryButton';
 import InputField from '../../components/InputField';
 import { Colors, Spacing, Radius } from '../../theme';
+import { sendEmailOTP } from '../../config/api';
 
 function validate(name, gmail) {
   const errors = {};
@@ -45,14 +46,21 @@ export default function GuestLoginScreen({ navigation }) {
     setErrors({});
     setLoading(true);
 
-    // Simulate API call to send OTP to Gmail
-    await new Promise((r) => setTimeout(r, 1400));
-    setLoading(false);
-
-    navigation.navigate('GuestOTP', {
-      name: name.trim(),
-      gmail: gmail.trim().toLowerCase(),
-    });
+    try {
+      const data = await sendEmailOTP(gmail.trim().toLowerCase(), name.trim());
+      if (!data.success) {
+        setErrors({ gmail: data.message || 'Failed to send code. Try again.' });
+        return;
+      }
+      navigation.navigate('GuestOTP', {
+        name: name.trim(),
+        gmail: gmail.trim().toLowerCase(),
+      });
+    } catch {
+      setErrors({ gmail: 'Network error. Make sure the server is running.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

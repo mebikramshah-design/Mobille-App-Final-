@@ -56,6 +56,22 @@ src/
 
 ## Getting Started
 
+The app has **two parts** that must run together:
+
+### 1. Backend (OTP delivery server)
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edit .env and fill in Gmail + Twilio credentials (see below)
+npm start
+```
+
+The server listens on `http://localhost:3000`.
+
+### 2. Mobile app
+
 ```bash
 npm install
 npx expo start
@@ -63,11 +79,34 @@ npx expo start
 
 Scan the QR code with **Expo Go** on iOS or Android.
 
-### Demo OTP Codes (development only)
-| Flow     | Code   |
-|----------|--------|
-| Guest    | 123456 |
-| Employee | 654321 |
+> Update `src/config/api.js` so `API_BASE_URL` points to your backend.
+> Use `http://10.0.2.2:3000` for the Android emulator, your machine's LAN IP for a physical device.
+
+## Real OTP Delivery
+
+OTPs are sent for real — no demo bypass codes.
+
+### Gmail (guest email OTP)
+1. Enable **2-Step Verification** at <https://myaccount.google.com/security>
+2. Open <https://myaccount.google.com/apppasswords>, generate a password for "Mail"
+3. In `backend/.env` set:
+   ```
+   GMAIL_USER=your-account@gmail.com
+   GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
+   ```
+
+### Twilio (employee SMS OTP)
+1. Sign up at <https://twilio.com/try-twilio>
+2. Copy **Account SID** and **Auth Token** from the console dashboard
+3. Provision a phone number under Phone Numbers → Buy a number
+4. In `backend/.env` set:
+   ```
+   TWILIO_ACCOUNT_SID=ACxxxx...
+   TWILIO_AUTH_TOKEN=xxxx...
+   TWILIO_PHONE_NUMBER=+1XXXXXXXXXX
+   ```
+
+OTPs are stored in-memory and expire after **5 minutes**.
 
 ## Tech Stack
 

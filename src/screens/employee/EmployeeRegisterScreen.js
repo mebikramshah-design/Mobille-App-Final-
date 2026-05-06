@@ -14,6 +14,7 @@ import Logo from '../../components/Logo';
 import PrimaryButton from '../../components/PrimaryButton';
 import InputField from '../../components/InputField';
 import { Colors, Spacing, Radius } from '../../theme';
+import { sendSmsOTP } from '../../config/api';
 
 function validate(fields) {
   const errors = {};
@@ -117,15 +118,22 @@ export default function EmployeeRegisterScreen({ navigation }) {
     setErrors({});
     setLoading(true);
 
-    // Simulate API call to register & send SMS OTP
-    await new Promise((r) => setTimeout(r, 1400));
-    setLoading(false);
-
-    navigation.navigate('EmployeeOTP', {
-      fullName: fields.fullName.trim(),
-      employeeId: fields.employeeId.trim().toUpperCase(),
-      mobile: fields.mobile.trim(),
-    });
+    try {
+      const data = await sendSmsOTP(fields.mobile.trim(), fields.fullName.trim());
+      if (!data.success) {
+        setErrors({ mobile: data.message || 'Failed to send SMS code. Try again.' });
+        return;
+      }
+      navigation.navigate('EmployeeOTP', {
+        fullName: fields.fullName.trim(),
+        employeeId: fields.employeeId.trim().toUpperCase(),
+        mobile: fields.mobile.trim(),
+      });
+    } catch {
+      setErrors({ mobile: 'Network error. Make sure the server is running.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
