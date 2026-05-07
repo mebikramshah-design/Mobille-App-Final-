@@ -5,6 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -65,7 +67,13 @@ export default function HomeTab({ navigation, route }) {
         subtitle={firstName}
         rightAction={{
           icon: 'notifications-outline',
-          onPress: () => {},
+          onPress: () =>
+            Alert.alert(
+              'Notifications',
+              user.type === 'employee'
+                ? "You're all caught up. New work-order alerts will appear here."
+                : "We'll notify you about company news and announcements here.",
+            ),
           badge: user.type === 'employee' ? 5 : null,
         }}
       />
@@ -193,7 +201,11 @@ export default function HomeTab({ navigation, route }) {
             <Ionicons name="arrow-forward" size={16} color={Colors.white} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.ctaSecondary} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={styles.ctaSecondary}
+            activeOpacity={0.85}
+            onPress={() => Linking.openURL('mailto:info@darwishinterserve.com')}
+          >
             <Ionicons name="call-outline" size={18} color={Colors.primary} />
             <Text style={styles.ctaSecondaryText}>Contact Us Today</Text>
           </TouchableOpacity>

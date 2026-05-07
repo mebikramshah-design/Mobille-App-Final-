@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ImageBackground,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,7 +60,10 @@ export default function ProjectsTab({ navigation, route }) {
         user={user}
         title="Our Projects"
         subtitle="100+ active engagements"
-        rightAction={{ icon: 'options-outline', onPress: () => {} }}
+        rightAction={{
+          icon: 'options-outline',
+          onPress: () => Alert.alert('Filter', 'Project filtering is coming soon.'),
+        }}
       />
 
       <ScrollView

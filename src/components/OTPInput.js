@@ -1,26 +1,36 @@
-import React, { useRef, useState } from 'react';
-import { View, TextInput, StyleSheet, Animated } from 'react-native';
+import React, { useRef } from 'react';
+import { View, TextInput, StyleSheet } from 'react-native';
 import { Colors, Radius } from '../theme';
 
 const OTP_LENGTH = 6;
 
 export default function OTPInput({ value = '', onChange, hasError = false }) {
   const inputs = useRef([]);
-  const shakeAnims = useRef(
-    Array.from({ length: OTP_LENGTH }, () => new Animated.Value(0))
-  ).current;
 
-  const digits = value.padEnd(OTP_LENGTH, '').split('').slice(0, OTP_LENGTH);
+  const digits = value.padEnd(OTP_LENGTH, ' ').split('').slice(0, OTP_LENGTH)
+    .map((c) => (c === ' ' ? '' : c));
 
   const handleChange = (text, index) => {
     const cleaned = text.replace(/[^0-9]/g, '');
     if (!cleaned) return;
 
-    const newDigits = [...digits];
-    newDigits[index] = cleaned[cleaned.length - 1];
-    onChange(newDigits.join('').trim());
+    // Multi-digit paste: distribute starting at this index.
+    if (cleaned.length > 1) {
+      const newDigits = [...digits];
+      for (let i = 0; i < cleaned.length && index + i < OTP_LENGTH; i++) {
+        newDigits[index + i] = cleaned[i];
+      }
+      onChange(newDigits.join(''));
+      const focusIdx = Math.min(index + cleaned.length, OTP_LENGTH - 1);
+      inputs.current[focusIdx]?.focus();
+      return;
+    }
 
-    if (index < OTP_LENGTH - 1 && cleaned) {
+    const newDigits = [...digits];
+    newDigits[index] = cleaned;
+    onChange(newDigits.join(''));
+
+    if (index < OTP_LENGTH - 1) {
       inputs.current[index + 1]?.focus();
     }
   };
@@ -30,10 +40,10 @@ export default function OTPInput({ value = '', onChange, hasError = false }) {
       const newDigits = [...digits];
       if (newDigits[index]) {
         newDigits[index] = '';
-        onChange(newDigits.join('').trimEnd());
+        onChange(newDigits.join(''));
       } else if (index > 0) {
         newDigits[index - 1] = '';
-        onChange(newDigits.join('').trimEnd());
+        onChange(newDigits.join(''));
         inputs.current[index - 1]?.focus();
       }
     }
@@ -50,7 +60,7 @@ export default function OTPInput({ value = '', onChange, hasError = false }) {
           : Colors.border;
 
         return (
-          <Animated.View
+          <View
             key={i}
             style={[
               styles.cell,
@@ -65,11 +75,13 @@ export default function OTPInput({ value = '', onChange, hasError = false }) {
               onChangeText={(text) => handleChange(text, i)}
               onKeyPress={(e) => handleKeyPress(e, i)}
               keyboardType="number-pad"
-              maxLength={1}
+              maxLength={i === 0 ? OTP_LENGTH : 1}
+              textContentType="oneTimeCode"
+              autoComplete="one-time-code"
               textAlign="center"
               selectTextOnFocus
             />
-          </Animated.View>
+          </View>
         );
       })}
     </View>

@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  Linking,
+  Share,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,7 +44,14 @@ export default function ProjectDetailScreen({ navigation, route }) {
             <Ionicons name="arrow-back" size={20} color={Colors.white} />
           </TouchableOpacity>
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity style={styles.iconBtn}>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() =>
+                Share.share({
+                  message: `${project.name} — ${project.client}\n\n${project.description}`,
+                })
+              }
+            >
               <Ionicons name="share-social-outline" size={18} color={Colors.white} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconBtn}>
@@ -141,11 +150,25 @@ export default function ProjectDetailScreen({ navigation, route }) {
 
         {/* CTA */}
         <View style={styles.ctaWrap}>
-          <TouchableOpacity style={styles.ctaPrimary} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={styles.ctaPrimary}
+            activeOpacity={0.85}
+            onPress={() =>
+              Linking.openURL(
+                `mailto:info@darwishinterserve.com?subject=${encodeURIComponent(
+                  `Project brief request: ${project.name}`,
+                )}`,
+              )
+            }
+          >
             <Ionicons name="document-text-outline" size={18} color={Colors.white} />
             <Text style={styles.ctaPrimaryText}>Request Project Brief</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.ctaSecondary} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={styles.ctaSecondary}
+            activeOpacity={0.85}
+            onPress={() => Linking.openURL('tel:+97444657777')}
+          >
             <Ionicons name="call-outline" size={18} color={Colors.primary} />
             <Text style={styles.ctaSecondaryText}>Contact Account Manager</Text>
           </TouchableOpacity>

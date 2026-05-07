@@ -26,7 +26,6 @@ export default function GuestOTPScreen({ navigation, route }) {
   const [resending, setResending] = useState(false);
 
   const shakeAnim = useRef(new Animated.Value(0)).current;
-  const successAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (countdown === 0) return;
@@ -162,7 +161,7 @@ export default function GuestOTPScreen({ navigation, route }) {
           <Text style={styles.tipsTitle}>Didn't get the email?</Text>
           <Text style={styles.tipsItem}>• Check your spam / junk folder</Text>
           <Text style={styles.tipsItem}>• Make sure you entered the correct Gmail</Text>
-          <Text style={styles.tipsItem}>• The code expires in 10 minutes</Text>
+          <Text style={styles.tipsItem}>• The code expires in 5 minutes</Text>
         </View>
       </View>
     </View>
