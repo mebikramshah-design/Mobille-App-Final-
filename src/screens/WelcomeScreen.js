@@ -6,6 +6,7 @@ import {
   Animated,
   Dimensions,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Logo from '../components/Logo';
@@ -102,6 +103,37 @@ export default function WelcomeScreen({ navigation }) {
           variant="outline"
           style={[styles.btn, styles.btnOutline]}
         />
+
+        {__DEV__ && (
+          <View style={styles.devRow}>
+            <TouchableOpacity
+              style={styles.devLink}
+              onPress={() =>
+                navigation.replace('Main', {
+                  user: { type: 'guest', name: 'Demo Guest', email: 'demo@gmail.com' },
+                })
+              }
+            >
+              <Text style={styles.devLinkText}>Skip → Guest</Text>
+            </TouchableOpacity>
+            <View style={styles.devDot} />
+            <TouchableOpacity
+              style={styles.devLink}
+              onPress={() =>
+                navigation.replace('Main', {
+                  user: {
+                    type: 'employee',
+                    name: 'Demo Employee',
+                    employeeId: 'DI-2024-001',
+                    mobile: '+97433123456',
+                  },
+                })
+              }
+            >
+              <Text style={styles.devLinkText}>Skip → Employee</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <Text style={styles.footerText}>
           Darwish Interserve Facility Management W.L.L.{'\n'}Qatar
@@ -202,5 +234,29 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     marginTop: Spacing.sm,
     lineHeight: 18,
+  },
+  devRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    marginBottom: 8,
+    gap: 10,
+  },
+  devLink: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  devLinkText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  devDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.textLight,
   },
 });
