@@ -40,7 +40,12 @@ export default function ProfileTab({ navigation, route }) {
         {
           text: 'Log Out',
           style: 'destructive',
-          onPress: () => navigation.getParent()?.replace?.('Welcome') || navigation.replace('Welcome'),
+          onPress: () => {
+            const parent = navigation.getParent();
+            if (parent?.reset) {
+              parent.reset({ index: 0, routes: [{ name: 'Welcome' }] });
+            }
+          },
         },
       ]
     );
@@ -54,7 +59,12 @@ export default function ProfileTab({ navigation, route }) {
       >
         <View style={styles.headerTop}>
           <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity style={styles.headerBtn}>
+          <TouchableOpacity
+            style={styles.headerBtn}
+            onPress={() =>
+              Alert.alert('Settings', 'App settings will be available in a future update.')
+            }
+          >
             <Ionicons name="settings-outline" size={20} color={Colors.white} />
           </TouchableOpacity>
         </View>
@@ -215,14 +225,14 @@ export default function ProfileTab({ navigation, route }) {
 
             <TouchableOpacity
               style={styles.contactRow}
-              onPress={() => Linking.openURL('tel:+974XXXXXXXX')}
+              onPress={() => Linking.openURL('tel:+97444657777')}
             >
               <View style={[styles.contactIcon, { backgroundColor: '#E6FBF3' }]}>
                 <Ionicons name="call" size={18} color={Colors.success} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.contactLabel}>Phone</Text>
-                <Text style={styles.contactValue}>+974 XXX XXXX</Text>
+                <Text style={styles.contactValue}>+974 4465 7777</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color={Colors.textLight} />
             </TouchableOpacity>

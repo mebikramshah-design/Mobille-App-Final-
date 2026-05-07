@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -61,7 +62,10 @@ export default function EventsTab({ route }) {
         user={user}
         title="News & Events"
         subtitle="Stay updated with DIFM"
-        rightAction={{ icon: 'search-outline', onPress: () => {} }}
+        rightAction={{
+          icon: 'search-outline',
+          onPress: () => Alert.alert('Search', 'Event search is coming soon.'),
+        }}
       />
 
       <ScrollView

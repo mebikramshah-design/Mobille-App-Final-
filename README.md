@@ -1,62 +1,67 @@
 # Darwish Interserve Mobile App
 
-A React Native (Expo) mobile application for **Darwish Interserve Facility Management W.L.L.**, Qatar's leading integrated facility management company.
+A React Native (Expo) mobile application for **Darwish Interserve Facility
+Management W.L.L.**, Qatar's leading integrated facility management company.
 
-## Features — Phase 2: Post-Login Tab Navigation
+## Features
 
-After successful authentication, the app drops the user into a 4-tab bottom
-navigator. Both Guest and Employee users share the same tab structure, but
-content adapts based on `user.type`.
+### Authentication
+| Flow | How it works |
+|------|--------------|
+| **Guest** | Name + Gmail → 6-digit code emailed via Gmail/Nodemailer → verify → enter app |
+| **Employee** | Name + Employee ID + Mobile + Password → 6-digit SMS code via Twilio → verify → enter app |
 
-| Tab        | Description |
-|------------|-------------|
-| **Home**     | Greeting, hero stats card, employee quick-actions (Work Orders / Clock In / Schedule / Reports), services grid (Hard FM, Soft FM, Security, MEP, Cleaning, Landscaping), featured client |
-| **Events**   | Featured event banner with RSVP, filter chips (All / Training / HSE / Company / Holidays), date-block event list with type pills |
-| **Projects** | Stats summary card (Total/Active/Staff/Sites), status filter pills with counts, project cards with progress bars and next-milestone footer |
-| **Profile**  | Avatar with verified badge (employees), employee/guest pill, contact info, employee tile row (Tasks/Awards/Tenure), grouped settings (Account/Preferences/Support), logout button |
+OTPs are stored in-memory on the backend and expire after **5 minutes**. The
+OTP input supports iOS auto-fill and full-code paste.
 
-## Features — Phase 1: Dual Authentication
+### Post-login tabs
+After verification, the user lands on a four-tab bottom navigator. Both Guest
+and Employee users share the same structure; the Home greeting and badges
+adapt to `user.type`.
 
-### Guest User Flow
-1. Tap **"Continue as Guest"** on the Welcome screen
-2. Enter **Full Name** + **Gmail address** (@gmail.com only)
-3. A **6-digit OTP** is sent to the Gmail inbox
-4. Verify the OTP → access the Guest Home dashboard
+| Tab        | Content |
+|------------|---------|
+| **Home**     | Greeting hero, "Redefining the Future" gradient banner, About-us blurb, Hard / Soft / Managed services list, Company-highlights grid, client-logo strip, "Explore Projects" + "Contact Us" CTAs |
+| **Events**   | Featured event card with READ MORE, expandable "More Updates" list with type pills, newsletter footer note |
+| **Projects** | Stats strip (active projects / sites / workforce), portfolio cards with sector banner and "View Details" → opens `ProjectDetailScreen` (overview, scope-of-work checklist, duration, share + brief-request CTAs) |
+| **Profile**  | Gradient header with avatar (✓ verified for employees), Company Overview, Vision & Mission, Core Values, ISO Certifications, Contact rows (mailto / tel deep-links), Log Out |
 
-### Internal Employee Flow
-1. Tap **"Employee Login / Register"** on the Welcome screen
-2. Fill in **Full Name**, **Employee ID**, **Mobile Number**, and **Password** (with strength indicator)
-3. A **6-digit SMS OTP** is sent to the registered mobile number
-4. Verify the OTP → access the Employee Home dashboard (with modules, stats, announcements)
-
-## Project Structure
+## Project structure
 
 ```
 src/
 ├── components/
-│   ├── Logo.js           # Darwish Interserve brand logo component
-│   ├── PrimaryButton.js  # Reusable button (primary / outline / ghost / accent)
-│   ├── InputField.js     # Form input with icon, focus state, and error display
-│   └── OTPInput.js       # 6-cell OTP input with auto-focus and backspace handling
-├── screens/
-│   ├── WelcomeScreen.js                 # Landing / splash with animated entry
-│   ├── guest/
-│   │   ├── GuestLoginScreen.js          # Gmail + Name form
-│   │   ├── GuestOTPScreen.js            # OTP verify + resend (60s cooldown)
-│   │   └── GuestHomeScreen.js           # Guest dashboard
-│   └── employee/
-│       ├── EmployeeRegisterScreen.js    # Full registration form + password strength
-│       ├── EmployeeOTPScreen.js         # SMS OTP verify + registration steps tracker
-│       └── EmployeeHomeScreen.js        # Employee dashboard with modules and stats
+│   ├── Logo.js           # DI emblem + wordmark
+│   ├── PrimaryButton.js  # primary / outline / ghost / accent variants
+│   ├── InputField.js     # labeled input with focus/error/hint + password reveal
+│   ├── OTPInput.js       # 6-cell code input — paste-aware, oneTimeCode auto-fill
+│   └── ScreenHeader.js   # gradient header used by tab screens
+├── config/
+│   └── api.js            # OTP backend client
 ├── navigation/
-│   └── AppNavigator.js   # React Navigation stack
+│   ├── AppNavigator.js   # native stack: auth flow + Main tabs + ProjectDetail
+│   └── MainTabs.js       # bottom tabs with active dot indicator
+├── screens/
+│   ├── WelcomeScreen.js
+│   ├── ProjectDetailScreen.js
+│   ├── guest/
+│   │   ├── GuestLoginScreen.js
+│   │   └── GuestOTPScreen.js
+│   ├── employee/
+│   │   ├── EmployeeRegisterScreen.js
+│   │   └── EmployeeOTPScreen.js
+│   └── tabs/
+│       ├── HomeTab.js
+│       ├── EventsTab.js
+│       ├── ProjectsTab.js
+│       └── ProfileTab.js
 └── theme/
-    └── index.js           # Colors, Typography, Spacing, Radius, Shadow
+    └── index.js          # Colors / Typography / Spacing / Radius / Shadow
 ```
 
-## Getting Started
+## Getting started
 
-The app has **two parts** that must run together:
+The app has **two parts** that run together:
 
 ### 1. Backend (OTP delivery server)
 
@@ -64,7 +69,7 @@ The app has **two parts** that must run together:
 cd backend
 npm install
 cp .env.example .env
-# Edit .env and fill in Gmail + Twilio credentials (see below)
+# fill in Gmail + Twilio credentials (see below)
 npm start
 ```
 
@@ -79,10 +84,12 @@ npx expo start
 
 Scan the QR code with **Expo Go** on iOS or Android.
 
-> Update `src/config/api.js` so `API_BASE_URL` points to your backend.
-> Use `http://10.0.2.2:3000` for the Android emulator, your machine's LAN IP for a physical device.
+> Update `src/config/api.js` so `API_BASE_URL` points to your backend:
+> - iOS Simulator → `http://localhost:3000`
+> - Android Emulator → `http://10.0.2.2:3000`
+> - Physical device → `http://<YOUR_LAN_IP>:3000`
 
-## Real OTP Delivery
+## Real OTP delivery
 
 OTPs are sent for real — no demo bypass codes.
 
@@ -106,12 +113,10 @@ OTPs are sent for real — no demo bypass codes.
    TWILIO_PHONE_NUMBER=+1XXXXXXXXXX
    ```
 
-OTPs are stored in-memory and expire after **5 minutes**.
-
-## Tech Stack
+## Tech stack
 
 - **Expo** ~51 (managed workflow)
-- **React Navigation** v6 (native stack)
+- **React Navigation** v6 (native stack + bottom tabs)
 - **expo-linear-gradient** — header and welcome gradients
 - **@expo/vector-icons** (Ionicons)
 - **react-native-safe-area-context**
@@ -124,3 +129,11 @@ OTPs are stored in-memory and expire after **5 minutes**.
 | Accent   | `#C9A84C` | Gold — highlights, badges |
 | Success  | `#10B981` | Verification, check marks |
 | Error    | `#EF4444` | Validation errors         |
+
+## Notes
+
+- App icon and splash image are not bundled in this repo. Drop PNGs into
+  `./assets/` and reference them from `app.json` to customize them; Expo's
+  defaults are used otherwise.
+- Bookmark, search, filter and settings buttons currently surface a "coming
+  soon" alert — wire them up when those features are implemented.
