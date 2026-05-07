@@ -1,11 +1,13 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // In-memory OTP store: key → { otp, expiresAt }
 const otpStore = new Map();
@@ -30,15 +32,26 @@ function checkOTP(key, otp) {
   return { valid: true };
 }
 
-// ─── Email (Nodemailer + Gmail) ───────────────────────────────────────────────
+function emailHTML(name, otp) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;">
+      <div style="background:#1B3A6B;padding:24px;border-radius:8px 8px 0 0;text-align:center;">
+        <h2 style="color:#C9A84C;margin:0;font-size:20px;letter-spacing:1px;">DARWISH INTERSERVE</h2>
+        <p style="color:rgba(255,255,255,0.7);margin:6px 0 0;font-size:13px;">Integrated Facilities Management</p>
+      </div>
+      <div style="background:#ffffff;padding:32px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
+        <p style="color:#374151;font-size:15px;margin-top:0;">Hello${name ? ' ' + name : ''},</p>
+        <p style="color:#6B7280;font-size:14px;">Use the code below to verify your identity. It expires in <strong>5 minutes</strong>.</p>
+        <div style="text-align:center;margin:28px 0;">
+          <span style="display:inline-block;font-size:38px;font-weight:800;letter-spacing:10px;color:#1B3A6B;background:#EEF2FF;padding:14px 28px;border-radius:10px;border:2px solid #C9A84C;">${otp}</span>
+        </div>
+        <p style="color:#9CA3AF;font-size:12px;text-align:center;margin-bottom:0;">Never share this code. Darwish Interserve staff will never ask for it.</p>
+      </div>
+    </div>
+  `;
+}
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+// ─── Email (Resend API — HTTPS, no SMTP port needed) ──────────────────────────
 
 app.post('/send-otp/email', async (req, res) => {
   const { email, name } = req.body;
@@ -47,33 +60,21 @@ app.post('/send-otp/email', async (req, res) => {
   const otp = generateOTP();
 
   try {
-    await transporter.sendMail({
-      from: `"Darwish Interserve" <${process.env.GMAIL_USER}>`,
+    const { error } = await resend.emails.send({
+      from: 'Darwish Interserve <onboarding@resend.dev>',
       to: email,
       subject: 'Your Verification Code — Darwish Interserve',
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;">
-          <div style="background:#1B3A6B;padding:24px;border-radius:8px 8px 0 0;text-align:center;">
-            <h2 style="color:#C9A84C;margin:0;font-size:20px;letter-spacing:1px;">DARWISH INTERSERVE</h2>
-            <p style="color:rgba(255,255,255,0.7);margin:6px 0 0;font-size:13px;">Integrated Facilities Management</p>
-          </div>
-          <div style="background:#ffffff;padding:32px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none;">
-            <p style="color:#374151;font-size:15px;margin-top:0;">Hello${name ? ' ' + name : ''},</p>
-            <p style="color:#6B7280;font-size:14px;">Use the code below to verify your identity. It expires in <strong>5 minutes</strong>.</p>
-            <div style="text-align:center;margin:28px 0;">
-              <span style="display:inline-block;font-size:38px;font-weight:800;letter-spacing:10px;color:#1B3A6B;background:#EEF2FF;padding:14px 28px;border-radius:10px;border:2px solid #C9A84C;">${otp}</span>
-            </div>
-            <p style="color:#9CA3AF;font-size:12px;text-align:center;margin-bottom:0;">Never share this code. Darwish Interserve staff will never ask for it.</p>
-          </div>
-        </div>
-      `,
+      html: emailHTML(name, otp),
     });
+
+    if (error) throw new Error(error.message);
+
     storeOTP(email.toLowerCase(), otp);
     console.log(`[EMAIL] OTP sent to ${email}`);
     res.json({ success: true });
   } catch (err) {
     console.error('[EMAIL] Error:', err.message);
-    res.status(500).json({ success: false, message: 'Failed to send email. Check server credentials.' });
+    res.status(500).json({ success: false, message: err.message || 'Failed to send email.' });
   }
 });
 
@@ -90,7 +91,6 @@ app.post('/send-otp/sms', async (req, res) => {
   const { mobile, name } = req.body;
   if (!mobile) return res.status(400).json({ success: false, message: 'Mobile is required' });
 
-  // Normalize: remove spaces, ensure E.164
   const normalized = mobile.replace(/\s/g, '');
   const otp = generateOTP();
 
@@ -141,6 +141,6 @@ app.get('/health', (_, res) => res.json({ status: 'ok' }));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n✅  DIFM OTP server running on http://localhost:${PORT}`);
-  console.log(`   Email : ${process.env.GMAIL_USER || '⚠️  GMAIL_USER not set'}`);
+  console.log(`   Email : ${process.env.RESEND_API_KEY ? '✓ Resend configured' : '⚠️  RESEND_API_KEY not set'}`);
   console.log(`   Twilio: ${process.env.TWILIO_ACCOUNT_SID ? '✓ configured' : '⚠️  TWILIO_ACCOUNT_SID not set'}\n`);
 });
