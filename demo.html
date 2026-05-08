@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Darwish Interserve — Full App Demo</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f1923;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  gap: 0;
+}
+
+/* ── Page header ── */
+.page-header { text-align: center; color: #fff; margin-bottom: 28px; }
+.page-header h1 { font-size: 24px; font-weight: 800; letter-spacing: 1.5px; }
+.page-header p  { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 6px; }
+
+/* ── Section nav tabs ── */
+.section-nav {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 36px;
+}
+.nav-btn {
+  padding: 9px 20px; border-radius: 22px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.5); background: transparent;
+  transition: all 0.2s;
+}
+.nav-btn.active { background: #fff; color: #1B3A6B; border-color: #fff; }
+
+/* ── Section wrapper ── */
+.section-block { width: 100%; display: none; flex-direction: column; align-items: center; gap: 20px; }
+.section-block.visible { display: flex; }
+.section-label {
+  color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; text-align: center;
+}
+
+/* ── Screen scroller ── */
+.screen-row {
+  display: flex; gap: 28px; overflow-x: auto;
+  padding-bottom: 10px; justify-content: center; flex-wrap: wrap;
+}
+
+/* ── Phone shell ── */
+.phone {
+  width: 355px; flex-shrink: 0;
+  background: #fff; border-radius: 44px;
+  border: 10px solid #1a1a2a;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 0 0 2px #333;
+  overflow: hidden; position: relative;
+}
+.phone.tall { /* auth screens */ }
+.phone.fixed { height: 800px; display: flex; flex-direction: column; }
+.phone-label {
+  color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 600;
+  text-align: center; letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.phone-wrap { text-align: center; }
+.notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 130px; height: 28px; background: #1a1a2a;
+  border-radius: 0 0 20px 20px; z-index: 99;
+}
+
+/* ── Design tokens ── */
+:root {
+  --primary:      #1B3A6B;
+  --primary-dark: #122649;
+  --primary-light:#2A5298;
+  --accent:       #C9A84C;
+  --accent-light: #E8C96A;
+  --bg:           #F5F6FA;
+  --surface:      #FFFFFF;
+  --text:         #1A1A2E;
+  --text-sec:     #6B7280;
+  --text-light:   #9CA3AF;
+  --border:       #E5E7EB;
+  --error:        #EF4444;
+  --success:      #10B981;
+}
+
+/* ── Status bar ── */
+.statusbar {
+  height: 48px; display: flex; align-items: flex-end;
+  justify-content: space-between; padding: 0 24px 8px;
+  font-size: 11px; font-weight: 700;
+}
+.statusbar.dark { background: transparent; color: #fff; }
+.statusbar.light { background: transparent; color: #1a1a2e; }
+
+/* ────────────────────────────────────────────────────
+   AUTH SCREENS
+──────────────────────────────────────────────────── */
+.screen-welcome {
+  height: 780px; background: linear-gradient(140deg, var(--primary-dark), var(--primary), var(--primary-light));
+  position: relative; overflow: hidden; display: flex; flex-direction: column;
+}
+.circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.07); }
+.circle-1 { width:320px;height:320px;top:-100px;right:-80px; }
+.circle-2 { width:260px;height:260px;bottom:240px;left:-100px; }
+.circle-3 { width:160px;height:160px;top:46%;right:-40px;background:rgba(201,168,76,0.12); }
+.welcome-content {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 32px 24px; position: relative; z-index: 2;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-emblem {
+  width: 52px; height: 52px; background: #fff; border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.logo-emblem-text { font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 1px; line-height: 1; }
+.logo-emblem-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--accent); }
+.logo-text { display: flex; flex-direction: column; }
+.logo-name { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 2px; line-height: 1.1; }
+.logo-sub  { font-size: 13px; font-weight: 600; color: var(--accent-light); letter-spacing: 1.5px; line-height: 1.1; }
+.logo-tag  { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 3px; }
+.logo.inv .logo-emblem { background: var(--primary); }
+.logo.inv .logo-emblem-text { color: #fff; }
+.welcome-divider { width: 48px; height: 3px; background: var(--accent); border-radius: 2px; margin: 20px 0; }
+.welcome-tagline { font-size: 24px; font-weight: 700; color: #fff; text-align: center; line-height: 1.35; letter-spacing: -0.3px; }
+.welcome-subtitle { font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; margin-top: 8px; line-height: 1.6; }
+.welcome-card { background: #fff; border-radius: 32px 32px 0 0; padding: 28px 24px 32px; position: relative; z-index: 2; }
+.welcome-card h2 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.welcome-card p  { font-size: 13px; color: var(--text-sec); margin-bottom: 18px; }
+.btn {
+  display: flex; align-items: center; justify-content: center;
+  height: 52px; border-radius: 12px; font-size: 15px; font-weight: 600;
+  cursor: pointer; width: 100%; border: none; margin-bottom: 12px; gap: 8px;
+}
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(27,58,107,0.3); }
+.btn-accent  { background: var(--accent); color: var(--primary); box-shadow: 0 4px 14px rgba(201,168,76,0.35); }
+.btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+.welcome-footer { text-align: center; font-size: 11px; color: var(--text-light); margin-top: 8px; line-height: 1.7; }
+
+.screen-light { height: 780px; background: var(--bg); display: flex; flex-direction: column; overflow-y: auto; }
+.screen-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 52px 16px 14px; background: #fff; border-bottom: 1px solid var(--border);
+}
+.back-btn {
+  width: 38px; height: 38px; border-radius: 10px; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.screen-body { padding: 24px 20px 32px; overflow-y: auto; }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; margin-bottom: 14px; }
+.badge-guest    { background: #FFF8E7; color: var(--accent); }
+.badge-employee { background: #EEF2FF; color: var(--primary); }
+.screen-title { font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.4px; }
+.screen-sub   { font-size: 13px; color: var(--text-sec); line-height: 1.6; margin-bottom: 18px; }
+.info-card { display: flex; gap: 10px; background: #EEF2FF; border-radius: 12px; padding: 14px; margin-bottom: 18px; align-items: flex-start; }
+.info-card p { font-size: 12px; color: var(--primary-light); line-height: 1.6; }
+.input-wrap { margin-bottom: 16px; }
+.input-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.input-row {
+  display: flex; align-items: center; border: 1.5px solid var(--border);
+  border-radius: 12px; height: 52px; background: #fff; padding: 0 14px; gap: 10px;
+}
+.input-row.focused { border-color: var(--primary); background: #F0F4FF; }
+.input-row input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: var(--text); }
+.input-row input::placeholder { color: var(--text-light); }
+.input-hint { font-size: 12px; color: var(--text-sec); margin-top: 4px; }
+.divider-row { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-text { font-size: 13px; color: var(--text-light); }
+.secondary-link {
+  display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px;
+  border-radius: 12px; border: 1px solid var(--border); background: #fff;
+  font-size: 14px; font-weight: 600; color: var(--primary);
+}
+.terms { font-size: 11px; color: var(--text-sec); text-align: center; margin-top: 14px; line-height: 1.7; }
+.terms a { color: var(--primary); font-weight: 600; }
+.security-note { display: flex; gap: 10px; align-items: flex-start; background: #D1FAE5; border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+.security-note p { font-size: 12px; color: #065F46; line-height: 1.6; }
+.pw-strength { display: flex; align-items: center; gap: 8px; margin-top: -10px; margin-bottom: 16px; }
+.pw-bars { display: flex; gap: 4px; flex: 1; }
+.pw-bar { flex: 1; height: 3px; border-radius: 2px; }
+.pw-label { font-size: 11px; font-weight: 600; }
+
+.otp-screen-body { display: flex; flex-direction: column; align-items: center; padding: 28px 20px 32px; }
+.icon-wrap { position: relative; margin-bottom: 20px; }
+.icon-circle { width: 80px; height: 80px; border-radius: 50%; background: #EEF2FF; border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; }
+.icon-badge { position: absolute; bottom: -2px; right: -6px; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+.icon-badge.green { background: var(--success); }
+.icon-badge.gold  { background: var(--accent); }
+.otp-title  { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.otp-sub    { font-size: 13px; color: var(--text-sec); text-align: center; line-height: 1.6; }
+.otp-email  { font-size: 15px; font-weight: 700; color: var(--primary); margin: 4px 0 20px; }
+.otp-row { display: flex; gap: 10px; justify-content: center; width: 100%; margin-bottom: 12px; }
+.otp-cell { width: 48px; height: 56px; border-radius: 12px; border: 1.5px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: var(--primary); }
+.otp-cell.filled { border-color: var(--primary); background: #EEF2FF; }
+.otp-cell.active { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,58,107,0.15); }
+.resend-row { display: flex; align-items: center; gap: 4px; margin-bottom: 20px; font-size: 13px; }
+.resend-row .label     { color: var(--text-sec); }
+.resend-row .countdown { color: var(--text-light); font-weight: 500; }
+.tips-card { width: 100%; background: #fff; border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+.tips-card h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.tips-card p  { font-size: 12px; color: var(--text-sec); line-height: 1.8; }
+.id-chip { display: flex; align-items: center; gap: 8px; background: #EEF2FF; border-radius: 10px; padding: 8px 14px; margin-bottom: 20px; font-size: 13px; }
+.id-chip .id-label { color: var(--text-sec); }
+.id-chip .id-val   { font-weight: 700; color: var(--primary); letter-spacing: 1px; }
+.steps-card { width: 100%; background: #fff; border-radius: 12px; padding: 16px; border: 1px solid var(--border); margin-top: 4px; }
+.steps-card h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.step-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.step-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-done    { background: var(--success); }
+.step-active  { background: var(--primary); }
+.step-pending { background: var(--border); }
+.step-text    { font-size: 13px; color: var(--text); }
+.step-text.active { font-weight: 600; color: var(--primary); }
+.step-text.muted  { color: var(--text-light); }
+
+/* ────────────────────────────────────────────────────
+   POST-LOGIN: SHARED CHROME
+──────────────────────────────────────────────────── */
+.app-header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  padding: 0 20px 18px; color: #fff; flex-shrink: 0;
+}
+.app-header-bg { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); flex-shrink: 0; }
+.header-row { display: flex; justify-content: space-between; align-items: center; }
+.header-title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.header-sub   { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.icon-btn .dot {
+  position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px;
+  border-radius: 8px; background: var(--error); color: #fff;
+  font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 3px;
+}
+.avatar { width: 42px; height: 42px; border-radius: 21px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--primary); }
+.content { flex: 1; overflow-y: auto; background: var(--bg); }
+.content::-webkit-scrollbar { display: none; }
+.tabbar {
+  height: 86px; background: #fff; border-top: 1px solid var(--border);
+  display: flex; padding: 8px 4px 28px; box-shadow: 0 -4px 8px rgba(0,0,0,0.04); flex-shrink: 0;
+}
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--text-light); position: relative; }
+.tab-icon-wrap { height: 28px; display: flex; align-items: center; justify-content: center; position: relative; }
+.tab-active-dot { position: absolute; top: -4px; width: 6px; height: 6px; border-radius: 3px; background: var(--accent); }
+.tab.active { color: var(--primary); }
+.tab-label { font-size: 11px; font-weight: 600; }
+.tab-badge { position: absolute; top: -2px; right: 32%; min-width: 16px; height: 16px; border-radius: 8px; background: var(--error); color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+
+/* ── Home tab ── */
+.hero {
+  margin: -16px 20px 0; border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 22px 20px; color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 6px 20px rgba(27,58,107,0.3);
+}
+.hero::before { content:''; position:absolute; top:-60px; right:-60px; width:180px; height:180px; border-radius:90px; background:rgba(201,168,76,0.18); }
+.hero-label { font-size: 10px; font-weight: 700; color: var(--accent-light); letter-spacing: 1.5px; }
+.hero-title { font-size: 22px; font-weight: 800; margin: 8px 0; line-height: 1.25; letter-spacing: -0.5px; }
+.hero-body  { font-size: 12px; color: rgba(255,255,255,0.75); margin-bottom: 14px; line-height: 1.55; }
+.hero-stats { display: flex; background: rgba(255,255,255,0.12); border-radius: 12px; padding: 12px; }
+.hero-stat { flex: 1; text-align: center; }
+.hero-stat-v { font-size: 17px; font-weight: 800; color: var(--accent); }
+.hero-stat-l { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.section-title-sm { font-size: 15px; font-weight: 700; color: var(--text); padding: 18px 20px 8px; }
+.section-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 8px; }
+.see-all { font-size: 12px; color: var(--primary); font-weight: 600; }
+.quick-row { display: flex; gap: 8px; padding: 0 20px; }
+.quick-card { flex: 1; background: #fff; border-radius: 12px; padding: 12px 6px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: relative; }
+.quick-card-icon { width: 38px; height: 38px; border-radius: 10px; background: #EEF2FF; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
+.quick-card-label { font-size: 10px; font-weight: 600; color: var(--text); }
+.quick-card-badge { position: absolute; top: 6px; right: 6px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--error); color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; }
+.service-card-sm { background: #fff; border-radius: 12px; padding: 14px 10px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.service-icon-sm { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+.service-label-sm { font-size: 11px; font-weight: 600; color: var(--text); }
+.featured-row { margin: 8px 20px 20px; background: #fff; border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.featured-row-icon { width: 42px; height: 42px; border-radius: 12px; background: #FFF8E7; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.featured-row-info { flex: 1; }
+.featured-row-info h4 { font-size: 13px; font-weight: 700; color: var(--text); }
+.featured-row-info p  { font-size: 11px; color: var(--text-sec); margin-top: 2px; line-height: 1.5; }
+
+/* ── Events tab ── */
+.featured-event-card {
+  margin: -16px 20px 0; border-radius: 16px;
+  background: linear-gradient(135deg, #EF4444, #B91C1C);
+  padding: 18px; color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 6px 20px rgba(239,68,68,0.3);
+}
+.featured-event-card::before { content:''; position:absolute; top:-50px; right:-50px; width:160px; height:160px; border-radius:80px; background:rgba(255,255,255,0.1); }
+.featured-pill { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 99px; font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #FEF3C7; margin-bottom: 12px; }
+.featured-event-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; position: relative; }
+.featured-icon-bg  { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.featured-event-type  { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+.featured-event-title { font-size: 17px; font-weight: 800; line-height: 1.25; margin-top: 2px; }
+.meta-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.85); margin-bottom: 4px; }
+.featured-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); margin-top: 12px; }
+.attendees-list { display: flex; align-items: center; }
+.mini-avatar { width: 22px; height: 22px; border-radius: 11px; background: var(--accent); border: 1.5px solid #B91C1C; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--primary); margin-right: -10px; }
+.attendees-text { font-size: 11px; color: #fff; font-weight: 600; margin-left: 16px; }
+.rsvp-btn { background: #fff; color: #B91C1C; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; }
+.filters { display: flex; gap: 8px; padding: 18px 20px 0; overflow-x: auto; }
+.filter-chip { padding: 7px 14px; border-radius: 99px; background: #fff; border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-sec); flex-shrink: 0; }
+.filter-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.events-list { padding: 12px 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+.event-card-row { background: #fff; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.date-block { width: 52px; height: 52px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.date-day { font-size: 18px; font-weight: 800; line-height: 1.1; }
+.date-month { font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+.event-body { flex: 1; min-width: 0; }
+.type-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
+.event-title-sm { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 4px; }
+.event-meta { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-sec); margin-top: 4px; }
+.chevron { color: var(--text-light); flex-shrink: 0; }
+
+/* ── Projects tab ── */
+.stats-card-row { margin: -16px 20px 0; background: #fff; border-radius: 12px; display: flex; padding: 16px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.stats-item { flex: 1; text-align: center; }
+.stats-value { font-size: 19px; font-weight: 800; color: var(--primary); }
+.stats-label { font-size: 10px; color: var(--text-sec); margin-top: 2px; }
+.stats-divider { width: 1px; background: var(--border); }
+.pill-filters { display: flex; gap: 8px; padding: 18px 20px 8px; overflow-x: auto; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 99px; background: #fff; border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-sec); flex-shrink: 0; }
+.pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.pill-count { background: var(--bg); padding: 1px 6px; border-radius: 10px; font-size: 10px; color: var(--text-sec); min-width: 20px; text-align: center; }
+.pill.active .pill-count { background: rgba(255,255,255,0.2); color: #fff; }
+.projects-list { padding: 8px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.project-card-sm { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.project-top-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.project-icon-sm { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.project-info { flex: 1; min-width: 0; }
+.project-head { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.project-name-sm { font-size: 13px; font-weight: 700; color: var(--text); }
+.status-pill { padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; flex-shrink: 0; }
+.project-meta { font-size: 11px; color: var(--text-sec); margin-top: 3px; }
+.project-meta b { font-weight: 600; letter-spacing: 0.5px; }
+.progress-info { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.progress-label { font-size: 11px; color: var(--text-sec); }
+.progress-value { font-size: 12px; font-weight: 800; }
+.progress-bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; }
+.project-footer-sm { display: flex; align-items: center; gap: 12px; padding-top: 10px; margin-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-sec); font-weight: 500; }
+.footer-item { display: flex; align-items: center; gap: 4px; }
+.milestone { color: var(--accent); margin-left: auto; font-weight: 600; }
+
+/* ── Profile tab ── */
+.profile-header-bg { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 0 20px 60px; color: #fff; flex-shrink: 0; }
+.profile-header-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; }
+.profile-card-center { text-align: center; }
+.avatar-large { width: 86px; height: 86px; border-radius: 43px; background: var(--accent); border: 3px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 36px; font-weight: 800; color: var(--primary); position: relative; }
+.verified-badge { position: absolute; bottom: 0; right: 0; background: #fff; border-radius: 12px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.profile-name { font-size: 22px; font-weight: 700; margin-top: 12px; letter-spacing: -0.3px; }
+.profile-type { display: inline-flex; align-items: center; gap: 5px; background: rgba(201,168,76,0.2); padding: 4px 10px; border-radius: 99px; margin-top: 6px; font-size: 11px; font-weight: 700; color: var(--accent-light); letter-spacing: 0.5px; }
+.contact-row-sm { display: flex; justify-content: center; gap: 12px; margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.7); }
+.contact-item { display: flex; align-items: center; gap: 4px; }
+.tile-row { display: flex; gap: 10px; padding: 0 20px; margin-top: -40px; margin-bottom: 24px; }
+.tile { flex: 1; border-radius: 12px; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.tile-icon  { font-size: 20px; margin-bottom: 4px; }
+.tile-value { font-size: 18px; font-weight: 800; color: var(--text); }
+.tile-label { font-size: 11px; color: var(--text-sec); font-weight: 600; }
+.profile-section { padding: 0 20px; margin-bottom: 18px; }
+.profile-section-title { font-size: 12px; font-weight: 700; color: var(--text-sec); letter-spacing: 1px; padding: 0 4px 8px; }
+.profile-card-list { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.profile-row { display: flex; align-items: center; padding: 14px; gap: 12px; }
+.row-icon { width: 32px; height: 32px; border-radius: 10px; background: #EEF2FF; display: flex; align-items: center; justify-content: center; }
+.row-label { flex: 1; font-size: 14px; font-weight: 500; color: var(--text); }
+.row-hint  { font-size: 12px; color: var(--text-sec); margin-right: 4px; }
+.toggle { width: 36px; height: 20px; background: var(--border); border-radius: 10px; position: relative; cursor: pointer; }
+.toggle.on { background: var(--primary); }
+.toggle::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:8px; background:#fff; transition:0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
+.toggle.on::after { left: 18px; }
+.logout-btn { margin: 8px 20px 14px; background: #FEE2E2; color: var(--error); padding: 14px; border-radius: 12px; text-align: center; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.version-text { text-align: center; font-size: 11px; color: var(--text-light); margin-bottom: 12px; }
+
+.legend { color: rgba(255,255,255,0.35); font-size: 12px; text-align: center; padding: 32px 0 20px; line-height: 2; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>DARWISH INTERSERVE — APP DEMO</h1>
+  <p>React Native · Expo ~51 · React Navigation v6 · Dual Auth + 4-Tab Experience</p>
+</div>
+
+<!-- ── Section Nav ── -->
+<div class="section-nav">
+  <button class="nav-btn active" onclick="showSection('auth')">Phase 1 — Auth</button>
+  <button class="nav-btn" onclick="showSection('tabs')">Phase 2 — App Tabs</button>
+  <button class="nav-btn" onclick="showSection('content')">Phase 3 — Rich Content</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 1: AUTH SCREENS
+═════════════════════════════════════════════════════════ -->
+<div id="auth" class="section-block visible">
+  <div class="section-label">Dual authentication — Guest (Gmail OTP) &amp; Employee (SMS OTP)</div>
+  <div class="screen-row">
+
+    <!-- 01 Welcome -->
+    <div class="phone-wrap">
+      <div class="phone-label">01 — Welcome</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-welcome">
+          <div class="statusbar dark"><span>9:41</span><span>▲▲▲ 100%</span></div>
+          <div class="circle circle-1"></div><div class="circle circle-2"></div><div class="circle circle-3"></div>
+          <div class="welcome-content">
+            <div class="logo">
+              <div class="logo-emblem"><span class="logo-emblem-text">DI</span><div class="logo-emblem-bar"></div></div>
+              <div class="logo-text"><span class="logo-name">DARWISH</span><span class="logo-sub">INTERSERVE</span><span class="logo-tag">Facility Management</span></div>
+            </div>
+            <div class="welcome-divider"></div>
+            <div class="welcome-tagline">Your integrated facility<br>management platform</div>
+            <div class="welcome-subtitle">Delivering excellence across Qatar's<br>most trusted facilities</div>
+          </div>
+          <div class="welcome-card">
+            <h2>Welcome</h2>
+            <p>Choose how you'd like to access the app</p>
+            <button class="btn btn-accent">Continue as Guest</button>
+            <button class="btn btn-outline">Employee Login / Register</button>
+            <div class="welcome-footer">Darwish Interserve Facility Management W.L.L.<br>Qatar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 Guest Login -->
+    <div class="phone-wrap">
+      <div class="phone-label">02 — Guest Login</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-light">
+          <div class="statusbar light"><span>9:41</span><span>▲▲▲ 100%</span></div>
+          <div class="screen-header">
+            <div class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="logo"><div class="logo-emblem inv"><span class="logo-emblem-text" style="color:#fff;font-size:13px;">DI</span><div class="logo-emblem-bar"></div></div><div class="logo-text"><span class="logo-name" style="color:var(--primary);font-size:12px;">DARWISH</span><span class="logo-sub" style="font-size:11px;">INTERSERVE</span></div></div>
+          </div>
+          <div class="screen-body">
+            <div class="badge badge-guest"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Guest Access</div>
+            <div class="screen-title">Guest Login</div>
+            <div class="screen-sub">Enter your name and Gmail to receive a one-time verification code.</div>
+            <div class="info-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A5298" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p>A 6-digit OTP will be sent to your Gmail inbox. No account creation required.</p></div>
+            <div class="input-wrap"><div class="input-label">Full Name</div><div class="input-row focused"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><input type="text" value="Ahmed Al-Rashid" readonly /></div></div>
+            <div class="input-wrap"><div class="input-label">Gmail Address</div><div class="input-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><input type="email" placeholder="yourname@gmail.com" readonly /></div><div class="input-hint">We only accept @gmail.com addresses</div></div>
+            <button class="btn btn-primary" style="margin-top:8px;">Send Verification Code</button>
+            <div class="terms">By continuing, you agree to Darwish Interserve's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+            <div class="divider-row"><div class="divider-line"></div><span class="divider-text">or</span><div class="divider-line"></div></div>
+            <div class="secondary-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>I'm an Employee — Login / Register</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 Guest OTP -->
+    <div class="phone-wrap">
+      <div class="phone-label">03 — Gmail OTP</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-light">
+          <div class="statusbar light"><span>9:41</span><span>▲▲▲ 100%</span></div>
+          <div class="screen-header"><div class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M15 18l-6-6 6-6"/></svg></div><div class="logo"><div class="logo-emblem inv"><span class="logo-emblem-text" style="color:#fff;font-size:13px;">DI</span><div class="logo-emblem-bar"></div></div><div class="logo-text"><span class="logo-name" style="color:var(--primary);font-size:12px;">DARWISH</span><span class="logo-sub" style="font-size:11px;">INTERSERVE</span></div></div></div>
+          <div class="otp-screen-body">
+            <div class="icon-wrap"><div class="icon-circle"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="icon-badge green"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+            <div class="otp-title">Check Your Gmail</div>
+            <div class="otp-sub">Hi <strong style="color:var(--primary)">Ahmed</strong>! We sent a 6-digit code to</div>
+            <div class="otp-email">ah****@gmail.com</div>
+            <div class="otp-row"><div class="otp-cell filled">1</div><div class="otp-cell filled">2</div><div class="otp-cell filled">3</div><div class="otp-cell active"></div><div class="otp-cell"></div><div class="otp-cell"></div></div>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:14px;opacity:0.5;">Verify &amp; Continue</button>
+            <div class="resend-row"><span class="label">Didn't receive the code? </span><span class="countdown">Resend in 47s</span></div>
+            <div class="tips-card"><h4>Didn't get the email?</h4><p>• Check your spam / junk folder<br>• Make sure you entered the correct Gmail<br>• The code expires in 10 minutes</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Employee Register -->
+    <div class="phone-wrap">
+      <div class="phone-label">04 — Employee Register</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-light">
+          <div class="statusbar light"><span>9:41</span><span>▲▲▲ 100%</span></div>
+          <div class="screen-header"><div class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M15 18l-6-6 6-6"/></svg></div><div class="logo"><div class="logo-emblem inv"><span class="logo-emblem-text" style="color:#fff;font-size:13px;">DI</span><div class="logo-emblem-bar"></div></div><div class="logo-text"><span class="logo-name" style="color:var(--primary);font-size:12px;">DARWISH</span><span class="logo-sub" style="font-size:11px;">INTERSERVE</span></div></div></div>
+          <div class="screen-body">
+            <div class="badge badge-employee"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Internal Employee</div>
+            <div class="screen-title">Employee Registration</div>
+            <div class="screen-sub">Create your Darwish Interserve account. Your mobile will be verified by SMS.</div>
+            <div class="input-wrap"><div class="input-label">Full Name</div><div class="input-row focused"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><input type="text" value="Mohammed Al-Mansoori" readonly /></div></div>
+            <div class="input-wrap"><div class="input-label">Employee ID</div><div class="input-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><input type="text" placeholder="e.g. DI-2024-001" readonly /></div><div class="input-hint">Provided by HR — check your onboarding letter</div></div>
+            <div class="input-wrap"><div class="input-label">Mobile Number</div><div class="input-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.59a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><input type="tel" placeholder="+974 3312 3456" readonly /></div></div>
+            <div class="input-wrap"><div class="input-label">Password</div><div class="input-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input type="password" value="MyP@ss123" readonly /></div></div>
+            <div class="pw-strength"><div class="pw-bars"><div class="pw-bar" style="background:#10B981;"></div><div class="pw-bar" style="background:#10B981;"></div><div class="pw-bar" style="background:#10B981;"></div><div class="pw-bar" style="background:#E5E7EB;"></div></div><span class="pw-label" style="color:#10B981;">Good</span></div>
+            <div class="security-note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg><p>Your data is encrypted and stored securely. Only Darwish Interserve HR has access.</p></div>
+            <button class="btn btn-primary">Register &amp; Send SMS Code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 Employee OTP -->
+    <div class="phone-wrap">
+      <div class="phone-label">05 — SMS OTP</div>
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen-light">
+          <div class="statusbar light"><span>9:41</span><span>▲▲▲ 100%</span></div>
+          <div class="screen-header"><div class="back-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M15 18l-6-6 6-6"/></svg></div><div class="logo"><div class="logo-emblem inv"><span class="logo-emblem-text" style="color:#fff;font-size:13px;">DI</span><div class="logo-emblem-bar"></div></div><div class="logo-text"><span class="logo-name" style="color:var(--primary);font-size:12px;">DARWISH</span><span class="logo-sub" style="font-size:11px;">INTERSERVE</span></div></div></div>
+          <div class="otp-screen-body">
+            <div class="icon-wrap"><div class="icon-circle"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="icon-badge gold"><svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div></div>
+            <div class="otp-title">Verify Your Mobile</div>
+            <div class="otp-sub">Welcome, <strong style="color:var(--primary)">Mohammed</strong>!<br>A 6-digit SMS code was sent to</div>
+            <div class="otp-email">+974****3456</div>
+            <div class="id-chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span class="id-label">Employee ID:</span><span class="id-val">DI-2024-001</span></div>
+            <div class="otp-row"><div class="otp-cell filled">6</div><div class="otp-cell filled">5</div><div class="otp-cell filled">4</div><div class="otp-cell filled">3</div><div class="otp-cell active"></div><div class="otp-cell"></div></div>
+            <button class="btn btn-primary" style="width:100%;margin-bottom:14px;opacity:0.5;">Verify &amp; Complete Registration</button>
+            <div class="resend-row"><span class="label">Didn't receive the SMS? </span><span class="countdown">Resend in 52s</span></div>
+            <div class="steps-card"><h4>Registration Steps</h4><div class="step-row"><div class="step-dot step-done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="step-text">Account details entered</span></div><div class="step-row"><div class="step-dot step-active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div><span class="step-text active">Mobile verification</span></div><div class="step-row" style="margin-bottom:0"><div class="step-dot step-pending"></div><span class="step-text muted">Account activated</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 2: POST-LOGIN TABS
+═════════════════════════════════════════════════════════ -->
+<div id="tabs" class="section-block">
+  <div class="section-label">4 main tabs after authentication</div>
+  <div class="screen-row">
+
+    <!-- 01 Home Tab -->
+    <div class="phone-wrap">
+      <div class="phone-label">01 — Home Tab</div>
+      <div class="phone fixed">
+        <div class="notch"></div>
+        <div class="app-header-bg"><div class="statusbar dark"><span>9:41</span><span>▲▲▲ 100%</span></div><div class="app-header"><div class="header-row"><div><div class="header-title">Good Morning,</div><div class="header-sub">Mohammed</div></div><div class="header-actions"><div class="icon-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot">5</span></div><div class="avatar">M</div></div></div></div></div>
+        <div class="content">
+          <div class="hero"><div class="hero-label">QATAR'S LEADING FM COMPANY</div><div class="hero-title">Excellence<br>in Every Detail</div><div class="hero-body">Your work powers Qatar's most trusted facilities.</div><div class="hero-stats"><div class="hero-stat"><div class="hero-stat-v">14+</div><div class="hero-stat-l">Years in Qatar</div></div><div class="hero-stat"><div class="hero-stat-v">85%</div><div class="hero-stat-l">Public Schools</div></div><div class="hero-stat"><div class="hero-stat-v">7K+</div><div class="hero-stat-l">Staff Strength</div></div></div></div>
+          <div class="section-title-sm">Quick Actions</div>
+          <div class="quick-row"><div class="quick-card"><div class="quick-card-badge">3</div><div class="quick-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><rect x="6" y="3" width="12" height="18" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg></div><div class="quick-card-label">Work Orders</div></div><div class="quick-card"><div class="quick-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="quick-card-label">Clock In</div></div><div class="quick-card"><div class="quick-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="quick-card-label">My Schedule</div></div><div class="quick-card"><div class="quick-card-badge">1</div><div class="quick-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="quick-card-label">Reports</div></div></div>
+          <div class="section-row"><div class="section-title-sm" style="padding:0">Our Services</div><div class="see-all">See all</div></div>
+          <div class="grid"><div class="service-card-sm"><div class="service-icon-sm" style="background:#3B82F618;"><svg width="20" height="20" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="service-label-sm">Hard FM</div></div><div class="service-card-sm"><div class="service-icon-sm" style="background:#10B98118;"><svg width="20" height="20" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/></svg></div><div class="service-label-sm">Soft FM</div></div><div class="service-card-sm"><div class="service-icon-sm" style="background:#EF444418;"><svg width="20" height="20" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="service-label-sm">Security</div></div><div class="service-card-sm"><div class="service-icon-sm" style="background:#F59E0B18;"><svg width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="service-label-sm">MEP</div></div><div class="service-card-sm"><div class="service-icon-sm" style="background:#06B6D418;"><svg width="20" height="20" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div><div class="service-label-sm">Cleaning</div></div><div class="service-card-sm"><div class="service-icon-sm" style="background:#84CC1618;"><svg width="20" height="20" fill="#84CC16" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/></svg></div><div class="service-label-sm">Landscaping</div></div></div>
+          <div class="section-title-sm">Featured Client</div>
+          <div class="featured-row"><div class="featured-row-icon"><svg width="22" height="22" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div><div class="featured-row-info"><h4>Hamad International Airport</h4><p>Integrated FM services for one of the world's leading airports.</p></div><svg class="chevron" width="18" height="18" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="tabbar"><div class="tab active"><div class="tab-icon-wrap"><div class="tab-active-dot"></div><svg width="22" height="22" fill="#1B3A6B" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="tab-label">Home</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="tab-badge" style="right:30%">2</span></div><div class="tab-label">Events</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="tab-label">Projects</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="tab-label">Profile</div></div></div>
+      </div>
+    </div>
+
+    <!-- 02 Events Tab -->
+    <div class="phone-wrap">
+      <div class="phone-label">02 — Events Tab</div>
+      <div class="phone fixed">
+        <div class="notch"></div>
+        <div class="app-header-bg"><div class="statusbar dark"><span>9:41</span><span>▲▲▲ 100%</span></div><div class="app-header"><div class="header-row"><div><div class="header-title">Events</div><div class="header-sub">5 upcoming events</div></div><div class="header-actions"><div class="icon-btn"><svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="avatar">M</div></div></div></div></div>
+        <div class="content">
+          <div class="featured-event-card">
+            <div class="featured-pill">★ FEATURED</div>
+            <div class="featured-event-row"><div class="featured-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div style="flex:1"><div class="featured-event-type">HSE</div><div class="featured-event-title">Mandatory HSE Safety Training</div></div></div>
+            <div class="meta-row"><svg width="13" height="13" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> May 10, 2026 · 09:00 — 12:00</div>
+            <div class="meta-row"><svg width="13" height="13" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Main Office, Doha</div>
+            <div class="featured-footer"><div class="attendees-list"><div class="mini-avatar">A</div><div class="mini-avatar">M</div><div class="mini-avatar">S</div><span class="attendees-text">+142 attending</span></div><div class="rsvp-btn">RSVP</div></div>
+          </div>
+          <div class="filters"><div class="filter-chip active">All</div><div class="filter-chip">Training</div><div class="filter-chip">HSE</div><div class="filter-chip">Company</div><div class="filter-chip">Holidays</div></div>
+          <div class="events-list">
+            <div class="event-card-row"><div class="date-block" style="background:#3B82F618;"><div class="date-day" style="color:#3B82F6">12</div><div class="date-month" style="color:#3B82F6">MAY</div></div><div class="event-body"><div class="type-pill" style="background:#3B82F618;color:#3B82F6;">📺 Training</div><div class="event-title-sm">New Work Order System Walkthrough</div><div class="event-meta">⏱ 14:00 — 15:30 · 📍 Online</div></div><svg class="chevron" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            <div class="event-card-row"><div class="date-block" style="background:#8B5CF618;"><div class="date-day" style="color:#8B5CF6">18</div><div class="date-month" style="color:#8B5CF6">MAY</div></div><div class="event-body"><div class="type-pill" style="background:#8B5CF618;color:#8B5CF6;">👥 Company</div><div class="event-title-sm">Q2 Town Hall Meeting</div><div class="event-meta">⏱ 10:00 — 11:30 · 📍 DIFM Auditorium</div></div><svg class="chevron" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            <div class="event-card-row"><div class="date-block" style="background:#10B98118;"><div class="date-day" style="color:#10B981">27</div><div class="date-month" style="color:#10B981">MAY</div></div><div class="event-body"><div class="type-pill" style="background:#10B98118;color:#10B981;">🌙 Holidays</div><div class="event-title-sm">Eid Al-Adha Holiday</div><div class="event-meta">⏱ All Day · 📍 Company-wide</div></div><svg class="chevron" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>
+        </div>
+        <div class="tabbar"><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="tab-label">Home</div></div><div class="tab active"><div class="tab-icon-wrap"><div class="tab-active-dot"></div><svg width="22" height="22" fill="#1B3A6B" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg><span class="tab-badge" style="right:30%">2</span></div><div class="tab-label">Events</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="tab-label">Projects</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="tab-label">Profile</div></div></div>
+      </div>
+    </div>
+
+    <!-- 03 Projects Tab -->
+    <div class="phone-wrap">
+      <div class="phone-label">03 — Projects Tab</div>
+      <div class="phone fixed">
+        <div class="notch"></div>
+        <div class="app-header-bg"><div class="statusbar dark"><span>9:41</span><span>▲▲▲ 100%</span></div><div class="app-header"><div class="header-row"><div><div class="header-title">Projects</div><div class="header-sub">Your assigned sites</div></div><div class="header-actions"><div class="icon-btn"><svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg></div><div class="avatar">M</div></div></div></div></div>
+        <div class="content">
+          <div class="stats-card-row"><div class="stats-item"><div class="stats-value">24</div><div class="stats-label">Total</div></div><div class="stats-divider"></div><div class="stats-item"><div class="stats-value" style="color:#10B981;">18</div><div class="stats-label">Active</div></div><div class="stats-divider"></div><div class="stats-item"><div class="stats-value" style="color:#C9A84C;">1.8K</div><div class="stats-label">Staff</div></div><div class="stats-divider"></div><div class="stats-item"><div class="stats-value" style="color:#3B82F6;">244</div><div class="stats-label">Sites</div></div></div>
+          <div class="pill-filters"><div class="pill active">All <div class="pill-count">24</div></div><div class="pill">Active <div class="pill-count">18</div></div><div class="pill">Pending <div class="pill-count">4</div></div><div class="pill">Complete <div class="pill-count">2</div></div></div>
+          <div class="projects-list">
+            <div class="project-card-sm"><div class="project-top-row"><div class="project-icon-sm" style="background:#3B82F618;"><svg width="22" height="22" fill="#3B82F6" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div><div class="project-info"><div class="project-head"><div class="project-name-sm">Hamad International Airport</div><div class="status-pill" style="background:#D1FAE5;color:#065F46;">ACTIVE</div></div><div class="project-meta"><b>HIA-2024-FM</b> · Aviation</div></div></div><div class="progress-info"><div class="progress-label">Progress</div><div class="progress-value" style="color:#3B82F6;">78%</div></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:#3B82F6;"></div></div><div class="project-footer-sm"><div class="footer-item">📍 12 sites</div><div class="footer-item">👥 240 staff</div><div class="milestone">🚩 Annual MEP audit · May 22</div></div></div>
+            <div class="project-card-sm"><div class="project-top-row"><div class="project-icon-sm" style="background:#10B98118;"><svg width="22" height="22" fill="#10B981" viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3 1 9l11 6 9-4.91V17h2V9L12 3z"/></svg></div><div class="project-info"><div class="project-head"><div class="project-name-sm">Qatar Public Schools</div><div class="status-pill" style="background:#D1FAE5;color:#065F46;">ACTIVE</div></div><div class="project-meta"><b>PSN-2024-INT</b> · Education</div></div></div><div class="progress-info"><div class="progress-label">Progress</div><div class="progress-value" style="color:#10B981;">92%</div></div><div class="progress-bar"><div class="progress-fill" style="width:92%;background:#10B981;"></div></div><div class="project-footer-sm"><div class="footer-item">📍 215 sites</div><div class="footer-item">👥 1.2K staff</div><div class="milestone">🚩 Term-end clean · May 28</div></div></div>
+            <div class="project-card-sm"><div class="project-top-row"><div class="project-icon-sm" style="background:#8B5CF618;"><svg width="22" height="22" fill="#8B5CF6" viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12z"/></svg></div><div class="project-info"><div class="project-head"><div class="project-name-sm">Katara Cultural Village</div><div class="status-pill" style="background:#FEF3C7;color:#92400E;">PENDING</div></div><div class="project-meta"><b>KAT-2024-CLT</b> · Culture</div></div></div><div class="progress-info"><div class="progress-label">Progress</div><div class="progress-value" style="color:#8B5CF6;">35%</div></div><div class="progress-bar"><div class="progress-fill" style="width:35%;background:#8B5CF6;"></div></div><div class="project-footer-sm"><div class="footer-item">📍 6 sites</div><div class="footer-item">👥 95 staff</div><div class="milestone">🚩 Phase 2 · Jun 03</div></div></div>
+          </div>
+        </div>
+        <div class="tabbar"><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="tab-label">Home</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="tab-badge" style="right:30%">2</span></div><div class="tab-label">Events</div></div><div class="tab active"><div class="tab-icon-wrap"><div class="tab-active-dot"></div><svg width="22" height="22" fill="#1B3A6B" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg></div><div class="tab-label">Projects</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="tab-label">Profile</div></div></div>
+      </div>
+    </div>
+
+    <!-- 04 Profile Tab -->
+    <div class="phone-wrap">
+      <div class="phone-label">04 — Profile Tab</div>
+      <div class="phone fixed">
+        <div class="notch"></div>
+        <div class="profile-header-bg">
+          <div class="statusbar dark"><span>9:41</span><span>▲▲▲ 100%</span></div>
+          <div class="profile-header-top"><div class="header-title">Profile</div><div class="icon-btn"><svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.55V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div></div>
+          <div class="profile-card-center"><div class="avatar-large">M<div class="verified-badge"><svg width="16" height="16" fill="#10B981" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15-5-5 1.4-1.4L10 14.2l7.6-7.6L19 8l-9 9z"/></svg></div></div><div class="profile-name">Mohammed Al-Mansoori</div><div class="profile-type">💼 Employee · DI-2024-001</div><div class="contact-row-sm"><div class="contact-item">📞 +974 ••••3456</div><div style="width:1px;height:12px;background:rgba(255,255,255,0.25);"></div><div class="contact-item">📍 Doha, Qatar</div></div></div>
+        </div>
+        <div class="content">
+          <div class="tile-row"><div class="tile" style="background:#EEF2FF;"><div class="tile-icon">✓</div><div class="tile-value">248</div><div class="tile-label">Tasks Done</div></div><div class="tile" style="background:#FFF8E7;"><div class="tile-icon">🏆</div><div class="tile-value">3</div><div class="tile-label">Awards</div></div><div class="tile" style="background:#D1FAE5;"><div class="tile-icon">⏱</div><div class="tile-value">1.2y</div><div class="tile-label">Tenure</div></div></div>
+          <div class="profile-section"><div class="profile-section-title">ACCOUNT</div><div class="profile-card-list"><div class="profile-row"><div class="row-icon"><svg width="18" height="18" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="row-label">Personal Information</div><svg class="chevron" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div><div style="height:1px;background:#E5E7EB;margin-left:58px;"></div><div class="profile-row"><div class="row-icon"><svg width="18" height="18" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="row-label">Security &amp; Password</div><svg class="chevron" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div></div>
+          <div class="profile-section"><div class="profile-section-title">PREFERENCES</div><div class="profile-card-list"><div class="profile-row"><div class="row-icon"><svg width="18" height="18" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div><div class="row-label">Push Notifications</div><div class="toggle on"></div></div><div style="height:1px;background:#E5E7EB;margin-left:58px;"></div><div class="profile-row"><div class="row-icon"><svg width="18" height="18" fill="none" stroke="#1B3A6B" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><div class="row-label">Language</div><div class="row-hint">English</div><svg class="chevron" width="16" height="16" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div></div>
+          <div class="logout-btn">↪ Log Out</div>
+          <div class="version-text">Darwish Interserve v1.0.0</div>
+        </div>
+        <div class="tabbar"><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="tab-label">Home</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="tab-badge" style="right:30%">2</span></div><div class="tab-label">Events</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="tab-label">Projects</div></div><div class="tab active"><div class="tab-icon-wrap"><div class="tab-active-dot"></div><svg width="22" height="22" fill="#1B3A6B" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="tab-label">Profile</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SECTION 3: CONTENT-RICH SCREENS
+═════════════════════════════════════════════════════════ -->
+<div id="content" class="section-block">
+  <div class="section-label">Real copy applied — Home, Events, Projects, Profile/About</div>
+  <div style="font-size:13px;color:rgba(255,255,255,0.5);text-align:center;">
+    See <strong style="color:rgba(255,255,255,0.8)">preview-content.html</strong> for the full content-rich screens with scrollable detail views.
+  </div>
+  <div class="screen-row">
+
+    <!-- Content Home -->
+    <div class="phone-wrap">
+      <div class="phone-label">01 — Home (Content)</div>
+      <div class="phone fixed">
+        <div class="notch"></div>
+        <div class="app-header-bg"><div class="statusbar dark"><span>9:41</span><span>▲▲▲ 100%</span></div><div class="app-header"><div class="header-row"><div><div class="header-title">Good Morning,</div><div class="header-sub">Mohammed</div></div><div class="header-actions"><div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg><span class="dot">5</span></div><div class="avatar">M</div></div></div></div></div>
+        <div class="content" style="padding-bottom:16px;">
+          <!-- Hero -->
+          <div style="margin:-16px 16px 0;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary-light));padding:22px 18px;color:#fff;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(27,58,107,0.3);">
+            <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:90px;background:rgba(201,168,76,0.18);"></div>
+            <div style="font-size:10px;font-weight:800;color:var(--accent-light);letter-spacing:2px;">WELCOME TO DIFM</div>
+            <div style="font-size:20px;font-weight:800;margin:8px 0;line-height:1.3;">Redefining the Future<br>for People and Places</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.75);">Your Trusted Facilities Management Partner in Qatar</div>
+          </div>
+          <!-- About -->
+          <div style="padding:20px 16px 0;">
+            <div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:2px;">ABOUT US</div>
+            <div style="font-size:18px;font-weight:700;color:var(--text);margin:6px 0 8px;">A leading integrated FM company</div>
+            <div style="font-size:12px;color:var(--text-sec);line-height:1.55;">Darwish Interserve is a leading integrated facilities management company in Qatar, established in 2010. With a highly skilled workforce, we deliver high-quality services across commercial, residential, and government sectors.</div>
+          </div>
+          <!-- Services -->
+          <div style="padding:20px 16px 0;">
+            <div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:2px;">WHAT WE DO</div>
+            <div style="font-size:18px;font-weight:700;color:var(--text);margin:6px 0 12px;">Our Services</div>
+            <div style="display:flex;align-items:center;background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="width:44px;height:44px;border-radius:12px;background:#EBF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="#3B82F6" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg></div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text);">Hard Services</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px;">Mechanical, Electrical, HVAC, Plumbing &amp; Civil maintenance.</div></div></div>
+            <div style="display:flex;align-items:center;background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="width:44px;height:44px;border-radius:12px;background:#E6FBF3;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="#10B981" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/></svg></div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text);">Soft Services</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px;">Cleaning, landscaping, pest control &amp; support services.</div></div></div>
+            <div style="display:flex;align-items:center;background:#fff;border-radius:12px;padding:12px;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="width:44px;height:44px;border-radius:12px;background:#F1ECFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="#8B5CF6" viewBox="0 0 24 24"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/><circle cx="12" cy="12" r="3"/></svg></div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--text);">Managed Services</div><div style="font-size:11px;color:var(--text-sec);margin-top:2px;">Integrated FM, energy management &amp; compliance solutions.</div></div></div>
+          </div>
+          <!-- Stats -->
+          <div style="background:#fff;padding:20px 16px;margin-top:20px;">
+            <div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:2px;text-align:center;">BY THE NUMBERS</div>
+            <div style="font-size:18px;font-weight:700;color:var(--text);text-align:center;margin:8px 0 14px;">Company Highlights</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="background:var(--bg);border-radius:12px;padding:14px;"><div style="font-size:20px;font-weight:800;color:#3B82F6;">3500+</div><div style="font-size:11px;color:var(--text-sec);font-weight:600;">Skilled Employees</div></div>
+              <div style="background:var(--bg);border-radius:12px;padding:14px;"><div style="font-size:20px;font-weight:800;color:#C9A84C;">100+</div><div style="font-size:11px;color:var(--text-sec);font-weight:600;">Active Projects</div></div>
+              <div style="background:var(--bg);border-radius:12px;padding:14px;"><div style="font-size:20px;font-weight:800;color:#10B981;">14+</div><div style="font-size:11px;color:var(--text-sec);font-weight:600;">Years Experience</div></div>
+              <div style="background:var(--bg);border-radius:12px;padding:14px;"><div style="font-size:20px;font-weight:800;color:#EF4444;">Qatar</div><div style="font-size:11px;color:var(--text-sec);font-weight:600;">Operating Nationwide</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar"><div class="tab active"><div class="tab-icon-wrap"><div class="tab-active-dot"></div><svg width="22" height="22" fill="#1B3A6B" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><div class="tab-label">Home</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="tab-label">Events</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="tab-label">Projects</div></div><div class="tab"><div class="tab-icon-wrap"><svg width="22" height="22" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="tab-label">Profile</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="legend">
+  Brand: Navy #1B3A6B · Gold #C9A84C · Background #F5F6FA<br>
+  React Native · Expo ~51 · React Navigation v6 · Dual Auth (Guest Gmail OTP + Employee SMS OTP)
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section-block').forEach(el => el.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
